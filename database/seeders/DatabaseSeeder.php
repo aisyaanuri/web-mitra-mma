@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             RoleUserSeeder::class,
             ProductSeeder::class,
             FakeOrderSeeder::class,
+            CompanyContentSeeder::class,
+            SiteSettingSeeder::class,
         ]);
     }
 }
