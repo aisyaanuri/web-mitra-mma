@@ -14,4 +14,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
         Route::livewire('pengguna/baru', 'pages::admin.users.form')->name('users.create');
         Route::livewire('pengguna/{user}/edit', 'pages::admin.users.form')->name('users.edit');
     });
+
+    Route::middleware('role:owner,admin_gudang')->group(function () {
+        Route::livewire('gudang', 'pages::admin.warehouse.index')->name('warehouse.index');
+    });
 });

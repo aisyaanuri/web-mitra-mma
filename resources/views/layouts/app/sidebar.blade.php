@@ -22,6 +22,12 @@
                         </flux:sidebar.item>
                     @endif
 
+                    @if (auth()->user()->hasRole(\App\Enums\UserRole::Owner, \App\Enums\UserRole::AdminGudang))
+                        <flux:sidebar.item icon="truck" :href="route('admin.warehouse.index')" :current="request()->routeIs('admin.warehouse.*')" wire:navigate>
+                            {{ __('Gudang') }}
+                        </flux:sidebar.item>
+                    @endif
+
                     @if (auth()->user()->isOwner())
                         <flux:sidebar.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
                             {{ __('Pengguna') }}
