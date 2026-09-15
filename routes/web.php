@@ -21,7 +21,7 @@ Route::get('/sitemap.xml', function () {
 require __DIR__.'/admin.php';
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::livewire('dashboard', 'pages::dashboard')->name('dashboard');
 });
 
 require __DIR__.'/settings.php';

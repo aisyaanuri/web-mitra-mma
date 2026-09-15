@@ -2,6 +2,10 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
+        {{-- ApexCharts is only needed on admin pages (Dashboard), so it's
+        a separate Vite entry kept out of the shared app.js bundle that
+        the public site also loads — see Fase 10 notes. --}}
+        @vite('resources/js/charts.js')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
