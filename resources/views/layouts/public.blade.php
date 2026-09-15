@@ -71,6 +71,7 @@
                         <ul class="mt-2 space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
                             <li><a href="{{ route('tentang-kami') }}" wire:navigate class="hover:text-amber-600">{{ __('Tentang Kami') }}</a></li>
                             <li><a href="{{ route('kontak') }}" wire:navigate class="hover:text-amber-600">{{ __('Kontak') }}</a></li>
+                            <li><a href="{{ route('kebijakan-privasi') }}" wire:navigate class="hover:text-amber-600">{{ __('Kebijakan Privasi') }}</a></li>
                         </ul>
                     </div>
                 </div>

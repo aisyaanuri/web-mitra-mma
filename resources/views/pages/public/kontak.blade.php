@@ -112,6 +112,11 @@ new #[Layout('layouts::public')] class extends Component
             <button type="submit" class="w-full rounded-lg bg-zinc-900 px-5 py-3 text-sm font-semibold text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200">
                 Kirim Pesan
             </button>
+
+            <p class="text-center text-xs text-zinc-500 dark:text-zinc-400">
+                Dengan mengirim formulir ini, Anda menyetujui
+                <a href="{{ route('kebijakan-privasi') }}" wire:navigate class="underline hover:text-amber-600">Kebijakan Privasi</a> kami.
+            </p>
         </form>
 
         <div class="space-y-6">
