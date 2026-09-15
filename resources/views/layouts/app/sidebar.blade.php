@@ -21,6 +21,12 @@
                             {{ __('Produk') }}
                         </flux:sidebar.item>
                     @endif
+
+                    @if (auth()->user()->isOwner())
+                        <flux:sidebar.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
+                            {{ __('Pengguna') }}
+                        </flux:sidebar.item>
+                    @endif
                 </flux:sidebar.group>
             </flux:sidebar.nav>
 
