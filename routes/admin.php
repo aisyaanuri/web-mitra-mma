@@ -18,4 +18,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
     Route::middleware('role:owner,admin_gudang')->group(function () {
         Route::livewire('gudang', 'pages::admin.warehouse.index')->name('warehouse.index');
     });
+
+    Route::middleware('role:owner,admin_marketplace')->group(function () {
+        Route::livewire('rekonsiliasi', 'pages::admin.reconciliation.index')->name('reconciliation.index');
+    });
 });

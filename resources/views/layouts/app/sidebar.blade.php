@@ -28,6 +28,12 @@
                         </flux:sidebar.item>
                     @endif
 
+                    @if (auth()->user()->hasRole(\App\Enums\UserRole::Owner, \App\Enums\UserRole::AdminMarketplace))
+                        <flux:sidebar.item icon="chevrons-up-down" :href="route('admin.reconciliation.index')" :current="request()->routeIs('admin.reconciliation.*')" wire:navigate>
+                            {{ __('Rekonsiliasi') }}
+                        </flux:sidebar.item>
+                    @endif
+
                     @if (auth()->user()->isOwner())
                         <flux:sidebar.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
                             {{ __('Pengguna') }}
