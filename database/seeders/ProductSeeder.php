@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Product;
-use App\Models\ProductImage;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
@@ -11,15 +10,13 @@ class ProductSeeder extends Seeder
     /**
      * Seed a representative product catalog. Real product names/photos are
      * still pending client confirmation (see docs/) — this is sample data
-     * for development, not the final catalog.
+     * for development, not the final catalog. No product_images are
+     * seeded since there are no real photo files to point them at yet;
+     * the public catalog shows a placeholder until an admin uploads real
+     * photos via the Product CRUD (Fase 4).
      */
     public function run(): void
     {
-        Product::factory()
-            ->count(12)
-            ->create()
-            ->each(function (Product $product) {
-                ProductImage::factory()->count(2)->create(['product_id' => $product->id]);
-            });
+        Product::factory()->count(12)->create();
     }
 }

@@ -27,6 +27,7 @@
 
                 <div class="hidden items-center gap-6 text-sm font-medium sm:flex">
                     <a href="{{ route('home') }}" wire:navigate class="hover:text-amber-600">{{ __('Beranda') }}</a>
+                    <a href="{{ route('produk') }}" wire:navigate class="hover:text-amber-600">{{ __('Produk') }}</a>
                     <a href="{{ route('tentang-kami') }}" wire:navigate class="hover:text-amber-600">{{ __('Tentang Kami') }}</a>
                     <a href="{{ route('kontak') }}" wire:navigate class="hover:text-amber-600">{{ __('Kontak') }}</a>
                     <a href="{{ route('login') }}" wire:navigate class="hover:text-amber-600">{{ __('Login Staf') }}</a>

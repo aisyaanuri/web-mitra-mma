@@ -90,10 +90,17 @@ new #[Layout('layouts::public')] class extends Component
 
     @if ($this->featuredProducts->isNotEmpty())
         <section class="mx-auto max-w-6xl px-4 py-16 sm:px-6" data-aos="fade-up">
-            <h2 class="text-2xl font-bold text-zinc-900 dark:text-white">Produk Unggulan</h2>
-            <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Contoh sebagian katalog kami — foto produk resmi menyusul.
-            </p>
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-zinc-900 dark:text-white">Produk Unggulan</h2>
+                    <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                        Contoh sebagian katalog kami — foto produk resmi menyusul.
+                    </p>
+                </div>
+                <a href="{{ route('produk') }}" wire:navigate class="text-sm font-semibold text-amber-600 hover:text-amber-700">
+                    Lihat Semua Produk &rarr;
+                </a>
+            </div>
 
             <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ($this->featuredProducts as $product)
