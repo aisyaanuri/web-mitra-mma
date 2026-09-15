@@ -21,5 +21,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
 
     Route::middleware('role:owner,admin_marketplace')->group(function () {
         Route::livewire('rekonsiliasi', 'pages::admin.reconciliation.index')->name('reconciliation.index');
+        Route::livewire('sinkronisasi', 'pages::admin.sync.index')->name('sync.index');
     });
 });

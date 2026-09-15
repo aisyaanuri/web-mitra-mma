@@ -32,6 +32,10 @@
                         <flux:sidebar.item icon="chevrons-up-down" :href="route('admin.reconciliation.index')" :current="request()->routeIs('admin.reconciliation.*')" wire:navigate>
                             {{ __('Rekonsiliasi') }}
                         </flux:sidebar.item>
+
+                        <flux:sidebar.item icon="folder-git-2" :href="route('admin.sync.index')" :current="request()->routeIs('admin.sync.*')" wire:navigate>
+                            {{ __('Sinkronisasi') }}
+                        </flux:sidebar.item>
                     @endif
 
                     @if (auth()->user()->isOwner())
