@@ -4,11 +4,15 @@ namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\LoginAttempt;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -29,6 +33,7 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
+        $this->configureAuthentication();
     }
 
     /**
@@ -38,6 +43,77 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::createUsersUsing(CreateNewUser::class);
+    }
+
+    /**
+     * Configure credential checking, account lockout (SR-03) and login
+     * attempt auditing (SR-27, SR-28).
+     */
+    private function configureAuthentication(): void
+    {
+        Fortify::authenticateUsing(function (Request $request) {
+            $user = User::where('email', $request->email)->first();
+
+            if ($user && $user->isLocked()) {
+                LoginAttempt::create([
+                    'email' => $request->email,
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'successful' => false,
+                ]);
+
+                throw ValidationException::withMessages([
+                    Fortify::username() => __('Akun ini terkunci sementara karena terlalu banyak percobaan login gagal. Coba lagi dalam beberapa menit.'),
+                ]);
+            }
+
+            $successful = $user
+                && $user->is_active
+                && Hash::check($request->password, $user->password);
+
+            LoginAttempt::create([
+                'email' => $request->email,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'successful' => $successful,
+            ]);
+
+            if (! $user) {
+                return null;
+            }
+
+            if (! $successful) {
+                $this->recordFailedAttempt($user);
+
+                return null;
+            }
+
+            $user->forceFill([
+                'failed_login_attempts' => 0,
+                'locked_until' => null,
+                'last_login_at' => now(),
+                'last_login_ip' => $request->ip(),
+            ])->save();
+
+            return $user;
+        });
+    }
+
+    /**
+     * Increment the failed-attempt counter and lock the account once it
+     * reaches the configured threshold.
+     */
+    private function recordFailedAttempt(User $user): void
+    {
+        $maxAttempts = config('security.login.max_attempts');
+        $attempts = $user->failed_login_attempts + 1;
+
+        $user->forceFill([
+            'failed_login_attempts' => $attempts,
+            'locked_until' => $attempts >= $maxAttempts
+                ? now()->addMinutes(config('security.login.lockout_minutes'))
+                : $user->locked_until,
+        ])->save();
     }
 
     /**
