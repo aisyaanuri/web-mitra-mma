@@ -94,3 +94,34 @@ select:focus[data-flux-control] {
 .animate-bubble-float {
     animation: bubble-float 6s ease-in-out infinite;
 }
+
+@keyframes blob-float {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(3%, -4%) scale(1.05);
+    }
+    66% {
+        transform: translate(-3%, 3%) scale(0.97);
+    }
+}
+
+.animate-blob-float {
+    animation: blob-float 14s ease-in-out infinite;
+}
+
+/* Subtle dot-grid texture. Colour it with a text-* utility (uses
+currentColor) and control intensity with a text color opacity modifier,
+e.g. text-white/10 or text-brand-900/5. */
+.bg-dot-grid {
+    background-image: radial-gradient(currentColor 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+}
+
+/* Editorial oversized heading — used sparingly for section titles that
+need more visual weight than a plain text-3xl/4xl. */
+.heading-display {
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+}

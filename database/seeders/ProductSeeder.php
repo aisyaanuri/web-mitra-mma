@@ -18,5 +18,11 @@ class ProductSeeder extends Seeder
     public function run(): void
     {
         Product::factory()->count(12)->create();
+
+        // Guarantee the homepage "Produk Unggulan" section always has enough
+        // items to fill its grid, regardless of the factory's random featured flag.
+        Product::query()->inRandomOrder()->limit(4)->get()->each(
+            fn (Product $product) => $product->update(['is_featured' => true])
+        );
     }
 }
