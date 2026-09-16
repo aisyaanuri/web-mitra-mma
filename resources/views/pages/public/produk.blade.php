@@ -58,59 +58,74 @@ new #[Layout('layouts::public')] class extends Component
             ->orderBy('name')
             ->paginate(9);
     }
+
+    #[Computed]
+    public function categoryIntro(): ?string
+    {
+        return match ($this->category) {
+            ProductCategory::YummyBites->value => 'Camilan MPASI untuk si kecil usia 6 bulan+ hingga 1 tahun+.',
+            ProductCategory::BerasImpor->value => 'Beras impor pilihan dari Jepang, Korea, India, Vietnam, dan Thailand.',
+            default => null,
+        };
+    }
 }; ?>
 
-<div class="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-    <h1 class="text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-white" data-aos="fade-up">Produk</h1>
-    <p class="mt-3 max-w-2xl text-zinc-600 dark:text-zinc-400" data-aos="fade-up">
-        Snack bayi Yummy Bites dan beras impor dari berbagai negara.
-    </p>
+<div class="bg-gradient-to-b from-brand-50 to-white dark:from-zinc-800 dark:to-zinc-900">
+    <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <h1 class="text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-white" data-aos="fade-up">Produk</h1>
+        <p class="mt-3 max-w-2xl text-zinc-600 dark:text-zinc-400" data-aos="fade-up">
+            Snack bayi Yummy Bites dan beras impor dari berbagai negara.
+        </p>
 
-    <div class="mt-8 flex flex-wrap gap-2" data-aos="fade-up">
-        <button
-            wire:click="$set('category', '')"
-            class="rounded-full px-4 py-2 text-sm font-medium {{ $category === '' ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'border border-zinc-300 text-zinc-700 dark:border-zinc-700 dark:text-zinc-300' }}"
-        >
-            Semua
-        </button>
-        <button
-            wire:click="$set('category', '{{ ProductCategory::YummyBites->value }}')"
-            class="rounded-full px-4 py-2 text-sm font-medium {{ $category === ProductCategory::YummyBites->value ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'border border-zinc-300 text-zinc-700 dark:border-zinc-700 dark:text-zinc-300' }}"
-        >
-            Yummy Bites
-        </button>
-        <button
-            wire:click="$set('category', '{{ ProductCategory::BerasImpor->value }}')"
-            class="rounded-full px-4 py-2 text-sm font-medium {{ $category === ProductCategory::BerasImpor->value ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'border border-zinc-300 text-zinc-700 dark:border-zinc-700 dark:text-zinc-300' }}"
-        >
-            Beras Impor
-        </button>
-    </div>
-
-    @if ($category === ProductCategory::BerasImpor->value && $this->countries->isNotEmpty())
-        <div class="mt-3 flex flex-wrap gap-2" data-aos="fade-up">
+        <div class="mt-8 flex flex-wrap gap-2" data-aos="fade-up">
             <button
-                wire:click="$set('country', '')"
-                class="rounded-full px-3 py-1 text-xs font-medium {{ $country === '' ? 'bg-amber-600 text-white' : 'border border-zinc-300 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400' }}"
+                wire:click="$set('category', '')"
+                class="rounded-full px-4 py-2 text-sm font-medium {{ $category === '' ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'border border-zinc-300 text-zinc-700 dark:border-zinc-700 dark:text-zinc-300' }}"
             >
-                Semua Negara
+                Semua
             </button>
-            @foreach ($this->countries as $originCountry)
-                <button
-                    wire:click="$set('country', '{{ $originCountry }}')"
-                    class="rounded-full px-3 py-1 text-xs font-medium {{ $country === $originCountry ? 'bg-amber-600 text-white' : 'border border-zinc-300 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400' }}"
-                >
-                    {{ $originCountry }}
-                </button>
-            @endforeach
+            <button
+                wire:click="$set('category', '{{ ProductCategory::YummyBites->value }}')"
+                class="rounded-full px-4 py-2 text-sm font-medium {{ $category === ProductCategory::YummyBites->value ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'border border-zinc-300 text-zinc-700 dark:border-zinc-700 dark:text-zinc-300' }}"
+            >
+                Yummy Bites
+            </button>
+            <button
+                wire:click="$set('category', '{{ ProductCategory::BerasImpor->value }}')"
+                class="rounded-full px-4 py-2 text-sm font-medium {{ $category === ProductCategory::BerasImpor->value ? 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' : 'border border-zinc-300 text-zinc-700 dark:border-zinc-700 dark:text-zinc-300' }}"
+            >
+                Beras Impor
+            </button>
         </div>
-    @endif
 
-    <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-aos="fade-up">
+        @if ($this->categoryIntro)
+            <p class="mt-3 text-sm text-brand-700 dark:text-brand-300" data-aos="fade-up">{{ $this->categoryIntro }}</p>
+        @endif
+
+        @if ($category === ProductCategory::BerasImpor->value && $this->countries->isNotEmpty())
+            <div class="mt-3 flex flex-wrap gap-2" data-aos="fade-up">
+                <button
+                    wire:click="$set('country', '')"
+                    class="rounded-full px-3 py-1 text-xs font-medium {{ $country === '' ? 'bg-brand-600 text-white' : 'border border-zinc-300 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400' }}"
+                >
+                    Semua Negara
+                </button>
+                @foreach ($this->countries as $originCountry)
+                    <button
+                        wire:click="$set('country', '{{ $originCountry }}')"
+                        class="rounded-full px-3 py-1 text-xs font-medium {{ $country === $originCountry ? 'bg-brand-600 text-white' : 'border border-zinc-300 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400' }}"
+                    >
+                        {{ $originCountry }}
+                    </button>
+                @endforeach
+            </div>
+        @endif
+
+        <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3" data-aos="fade-up">
         @forelse ($this->products as $product)
-            <div class="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800" wire:key="product-{{ $product->id }}">
+            <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white transition hover:-translate-y-1 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900" wire:key="product-{{ $product->id }}">
                 @if ($product->images->isEmpty())
-                    <div class="flex aspect-square items-center justify-center bg-amber-50 text-amber-600 dark:bg-amber-950 dark:text-amber-400">
+                    <div class="flex aspect-square items-center justify-center bg-brand-50 text-brand-600 dark:bg-brand-900 dark:text-brand-300">
                         <span class="text-4xl font-bold">{{ mb_substr($product->name, 0, 1) }}</span>
                     </div>
                 @elseif ($product->images->count() === 1)
@@ -154,9 +169,10 @@ new #[Layout('layouts::public')] class extends Component
         @empty
             <p class="col-span-full text-sm text-zinc-500 dark:text-zinc-400">Belum ada produk untuk kategori ini.</p>
         @endforelse
-    </div>
+        </div>
 
-    <div class="mt-8">
-        {{ $this->products->links() }}
+        <div class="mt-8">
+            {{ $this->products->links() }}
+        </div>
     </div>
 </div>

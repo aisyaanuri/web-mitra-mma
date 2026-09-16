@@ -30,6 +30,19 @@
     --color-accent: var(--color-neutral-800);
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
+
+    /* Brand palette derived from the client's logo (ocean-blue circular
+    badge with a whale motif) — used across the public site only. */
+    --color-brand-50: #eff8ff;
+    --color-brand-100: #dbeeff;
+    --color-brand-200: #b8dcff;
+    --color-brand-300: #85c4ff;
+    --color-brand-400: #38a6e0;
+    --color-brand-500: #1c7fc4;
+    --color-brand-600: #145c99;
+    --color-brand-700: #0d3d66;
+    --color-brand-800: #092a47;
+    --color-brand-900: #062136;
 }
 
 @layer theme {
@@ -68,3 +81,16 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
+
+@keyframes bubble-float {
+    0%, 100% {
+        transform: translateY(0) translateX(0);
+    }
+    50% {
+        transform: translateY(-18px) translateX(6px);
+    }
+}
+
+.animate-bubble-float {
+    animation: bubble-float 6s ease-in-out infinite;
+}

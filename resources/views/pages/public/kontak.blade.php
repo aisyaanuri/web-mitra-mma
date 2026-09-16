@@ -115,7 +115,7 @@ new #[Layout('layouts::public')] class extends Component
 
             <p class="text-center text-xs text-zinc-500 dark:text-zinc-400">
                 Dengan mengirim formulir ini, Anda menyetujui
-                <a href="{{ route('kebijakan-privasi') }}" wire:navigate class="underline hover:text-amber-600">Kebijakan Privasi</a> kami.
+                <a href="{{ route('kebijakan-privasi') }}" wire:navigate class="underline hover:text-brand-600">Kebijakan Privasi</a> kami.
             </p>
         </form>
 
