@@ -33,8 +33,11 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    --color-accent: var(--color-neutral-800);
-    --color-accent-content: var(--color-neutral-800);
+    /* Flux UI's accent token, retheme to brand blue (login/admin — the
+    public site doesn't use Flux) so primary buttons/checkboxes/focus
+    rings match the "Manifest" identity instead of generic neutral/black. */
+    --color-accent: var(--color-brand-600);
+    --color-accent-content: var(--color-brand-600);
     --color-accent-foreground: var(--color-white);
 
     /* Brand palette derived from the client's real logo (ocean-blue circular
@@ -71,9 +74,9 @@
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-white);
-        --color-accent-content: var(--color-white);
-        --color-accent-foreground: var(--color-neutral-800);
+        --color-accent: var(--color-brand-400);
+        --color-accent-content: var(--color-brand-400);
+        --color-accent-foreground: var(--color-brand-900);
     }
 }
 
