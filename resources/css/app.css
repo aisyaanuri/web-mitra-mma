@@ -149,3 +149,10 @@ need more visual weight than a plain text-3xl/4xl. */
     letter-spacing: -0.02em;
     line-height: 1.05;
 }
+
+/* Dashed shipping-route connector — colour with a text-* utility (uses
+currentColor), for the "Manifest" concept's distribution-route diagram. */
+.route-line {
+    background-image: repeating-linear-gradient(to right, currentColor 0, currentColor 5px, transparent 5px, transparent 12px);
+    height: 2px;
+}

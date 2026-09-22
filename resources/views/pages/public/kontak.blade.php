@@ -63,13 +63,9 @@ new #[Layout('layouts::public')] class extends Component
 
 <div>
     {{-- Hero --}}
-    <section class="relative overflow-hidden bg-gradient-to-br from-brand-700 via-brand-800 to-brand-900">
-        <div class="absolute inset-0 bg-dot-grid text-white/[0.07]"></div>
-        <span class="animate-blob-float pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-brand-400/20 blur-3xl"></span>
-
-        <div class="relative mx-auto max-w-6xl px-4 py-16 sm:px-6" data-aos="fade-up">
-            <p class="text-xs font-bold tracking-widest text-brand-200 uppercase">Hubungi Kami</p>
-            <h1 class="heading-display mt-3 text-4xl font-extrabold text-white sm:text-5xl">Mari Bekerja Sama</h1>
+    <section class="bg-brand-900">
+        <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6" data-aos="fade-up">
+            <h1 class="heading-display font-display text-4xl font-bold text-white sm:text-5xl">Mari Bekerja Sama</h1>
             <p class="mt-4 max-w-xl text-brand-100">
                 Tertarik menjadi mitra distribusi kami? Kirimkan pesan Anda atau hubungi kami langsung.
             </p>

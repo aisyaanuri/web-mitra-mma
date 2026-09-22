@@ -72,13 +72,9 @@ new #[Layout('layouts::public')] class extends Component
 
 <div>
     {{-- Hero --}}
-    <section class="relative overflow-hidden bg-gradient-to-br from-brand-700 via-brand-800 to-brand-900">
-        <div class="absolute inset-0 bg-dot-grid text-white/[0.07]"></div>
-        <span class="animate-blob-float pointer-events-none absolute -left-16 -top-16 h-64 w-64 rounded-full bg-brand-400/20 blur-3xl"></span>
-
-        <div class="relative mx-auto max-w-6xl px-4 py-16 sm:px-6" data-aos="fade-up">
-            <p class="text-xs font-bold tracking-widest text-brand-200 uppercase">Katalog</p>
-            <h1 class="heading-display mt-3 text-4xl font-extrabold text-white sm:text-5xl">Produk Kami</h1>
+    <section class="bg-brand-900">
+        <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6" data-aos="fade-up">
+            <h1 class="heading-display font-display text-4xl font-bold text-white sm:text-5xl">Produk Kami</h1>
             <p class="mt-4 max-w-xl text-brand-100">
                 Snack bayi Yummy Bites dan beras impor pilihan dari berbagai negara.
             </p>
@@ -132,24 +128,26 @@ new #[Layout('layouts::public')] class extends Component
 
         <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         @forelse ($this->products as $product)
-            <div class="group overflow-hidden rounded-2xl border border-zinc-100 bg-white transition hover:-translate-y-1 hover:shadow-xl hover:shadow-zinc-900/5 dark:border-zinc-800 dark:bg-zinc-900" wire:key="product-{{ $product->id }}" data-aos="fade-up">
+            <div class="overflow-hidden rounded-xl border border-zinc-100 bg-white transition hover:border-brand-200 dark:border-zinc-800 dark:bg-zinc-900" wire:key="product-{{ $product->id }}">
                 @if ($product->images->isEmpty())
-                    <div class="flex aspect-square items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100 text-brand-600 transition group-hover:scale-[1.03] dark:from-brand-900 dark:to-brand-800 dark:text-brand-300">
-                        <span class="text-4xl font-black">{{ mb_substr($product->name, 0, 1) }}</span>
+                    <div class="flex aspect-square items-center justify-center bg-zinc-50 text-brand-300 dark:bg-zinc-800">
+                        <span class="font-display text-4xl">{{ mb_substr($product->name, 0, 1) }}</span>
                     </div>
                 @elseif ($product->images->count() === 1)
-                    <img src="{{ $product->images->first()->url() }}" alt="{{ $product->images->first()->alt_text ?? $product->name }}" class="aspect-square w-full object-cover">
+                    <div class="flex aspect-square items-center justify-center bg-zinc-50 dark:bg-zinc-800">
+                        <img src="{{ $product->images->first()->url() }}" alt="{{ $product->images->first()->alt_text ?? $product->name }}" class="h-full w-full object-contain p-4">
+                    </div>
                 @else
                     <div
                         x-data
                         x-init="new Swiper($refs.swiper, { modules: [SwiperModules.Navigation, SwiperModules.Pagination], navigation: true, pagination: { el: $refs.swiper.querySelector('.swiper-pagination') } })"
-                        class="relative"
+                        class="relative bg-zinc-50 dark:bg-zinc-800"
                     >
                         <div class="swiper aspect-square" x-ref="swiper">
                             <div class="swiper-wrapper">
                                 @foreach ($product->images as $image)
                                     <div class="swiper-slide">
-                                        <img src="{{ $image->url() }}" alt="{{ $image->alt_text ?? $product->name }}" class="h-full w-full object-cover">
+                                        <img src="{{ $image->url() }}" alt="{{ $image->alt_text ?? $product->name }}" class="h-full w-full object-contain p-4">
                                     </div>
                                 @endforeach
                             </div>

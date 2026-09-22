@@ -40,7 +40,7 @@
                     <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-400 via-brand-600 to-brand-800 text-xs font-bold tracking-wide text-white shadow-md shadow-brand-500/30">
                         MMA
                     </span>
-                    <span class="text-base font-bold tracking-tight text-zinc-900 sm:text-lg dark:text-white">
+                    <span class="font-display text-lg font-bold text-zinc-900 sm:text-xl dark:text-white">
                         PT Mustika Makmur Abadi
                     </span>
                 </a>
@@ -128,20 +128,20 @@
                             <span class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-300 to-brand-600 text-xs font-bold text-white">
                                 MMA
                             </span>
-                            <p class="text-base font-bold text-white">PT Mustika Makmur Abadi</p>
+                            <p class="font-display text-lg font-bold text-white">PT Mustika Makmur Abadi</p>
                         </div>
                         <p class="mt-4 max-w-xs text-sm leading-relaxed text-brand-200">
                             Distributor resmi Yummy Bites dan beras impor, berdiri sejak {{ \App\Models\SiteSetting::get('established_year', '2019') }}.
                         </p>
                     </div>
                     <div>
-                        <p class="text-xs font-semibold tracking-wider text-brand-400 uppercase">{{ __('Alamat') }}</p>
+                        <p class="font-display text-sm font-bold text-white">{{ __('Alamat') }}</p>
                         <p class="mt-4 text-sm leading-relaxed text-brand-200">
                             {{ \App\Models\SiteSetting::get('office_address') }}
                         </p>
                     </div>
                     <div>
-                        <p class="text-xs font-semibold tracking-wider text-brand-400 uppercase">{{ __('Tautan') }}</p>
+                        <p class="font-display text-sm font-bold text-white">{{ __('Tautan') }}</p>
                         <ul class="mt-4 space-y-2 text-sm text-brand-200">
                             <li><a href="{{ route('produk') }}" wire:navigate class="transition hover:text-white">{{ __('Produk') }}</a></li>
                             <li><a href="{{ route('tentang-kami') }}" wire:navigate class="transition hover:text-white">{{ __('Tentang Kami') }}</a></li>
