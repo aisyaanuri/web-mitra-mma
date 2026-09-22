@@ -12,8 +12,7 @@ class SiteSettingSeeder extends Seeder
         $officeAddress = 'Pergudangan Sirie Blok G-6, Lingkar Timur, Rangkah Kidul, Sidoarjo';
 
         $settings = [
-            // TODO: placeholder — client hasn't confirmed the official WhatsApp number yet (see docs/).
-            'whatsapp_number' => '6281234567890',
+            'whatsapp_number' => '6281359147191',
             'office_address' => $officeAddress,
             'google_maps_embed_src' => 'https://www.google.com/maps?q='.rawurlencode($officeAddress).'&output=embed',
             'outlets_count' => '355',

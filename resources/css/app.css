@@ -15,6 +15,12 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
+    /* "Manifest" design concept (Fase 14): a condensed, industrial display
+    face for headings and large numerals — evokes shipping-crate stencils
+    and port signage, deliberately distinct from the humanist body face.
+    Used for headings/stats, never for body copy. */
+    --font-display: 'Big Shoulders Display', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
     --color-zinc-200: #e5e5e5;
@@ -31,8 +37,10 @@
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
 
-    /* Brand palette derived from the client's logo (ocean-blue circular
-    badge with a whale motif) — used across the public site only. */
+    /* Brand palette derived from the client's real logo (ocean-blue circular
+    badge with a whale motif). Concept name: "Manifest" — a distributor
+    that ships imported goods (rice) across the archipelago, styled after
+    shipping manifests and nautical charts rather than generic SaaS blue. */
     --color-brand-50: #eff8ff;
     --color-brand-100: #dbeeff;
     --color-brand-200: #b8dcff;
@@ -43,6 +51,22 @@
     --color-brand-700: #0d3d66;
     --color-brand-800: #092a47;
     --color-brand-900: #062136;
+
+    /* Warm chart-paper surface — replaces flat white as the secondary
+    section background on the public site, evoking aged nautical chart
+    paper rather than a default SaaS off-white. */
+    --color-parchment-50: #fbfaf6;
+    --color-parchment-100: #f4f1e6;
+    --color-parchment-200: #eae4d0;
+
+    /* Ink-stamp accent — used sparingly (CTAs, status marks, one
+    highlight per section at most), never as a base color. */
+    --color-stamp-500: #b8462f;
+    --color-stamp-600: #9c3a26;
+
+    /* Brass/hardware accent — even more sparing than stamp, for small
+    marks like certification badges or a single highlighted stat. */
+    --color-brass-500: #b3872f;
 }
 
 @layer theme {

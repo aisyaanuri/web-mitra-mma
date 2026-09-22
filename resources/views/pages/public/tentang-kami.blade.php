@@ -163,10 +163,6 @@ new #[Layout('layouts::public')] class extends Component
                         </ul>
                     </div>
                 </div>
-
-                <p class="mt-6 text-center text-xs text-zinc-400 italic dark:text-zinc-500">
-                    * Draf visi &amp; misi — menunggu persetujuan akhir dari PT Mustika Makmur Abadi.
-                </p>
             </div>
         </section>
     @endif

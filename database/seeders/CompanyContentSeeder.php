@@ -9,11 +9,8 @@ use Illuminate\Database\Seeder;
  * Seeds real company profile copy sourced from the client's existing
  * temporary site (see docs/Pemetaan Konten Company Profile...).
  *
- * Visi & misi (below) is a DRAFT written by the dev team, not confirmed
- * by the client yet — it renders on the live Tentang Kami page (Fase 13
- * redesign) so the site isn't empty, but MUST be reviewed/approved (or
- * replaced with the client's own wording) before real go-live. Flagged
- * in docs/ and the implementation plan as an open item to confirm.
+ * Visi & misi (below) is the client's own approved wording, supplied
+ * 2026-09-22 as a presentation slide (Visi & Misi Perusahaan).
  */
 class CompanyContentSeeder extends Seeder
 {
@@ -41,7 +38,7 @@ class CompanyContentSeeder extends Seeder
             [
                 'section_key' => 'tentang_kami_visi_misi',
                 'title' => 'Visi & Misi',
-                'body' => "Visi\nMenjadi distributor snack bayi dan beras impor terpercaya dan terdepan di Indonesia, yang menghadirkan produk berkualitas untuk mendukung tumbuh kembang si kecil dan kebutuhan pangan sehari-hari keluarga Indonesia.\n\nMisi\n1. Menyediakan produk MPASI dan beras impor berkualitas tinggi dengan harga kompetitif.\n2. Membangun jaringan distribusi yang luas dan andal ke seluruh Indonesia.\n3. Memberikan pelayanan pengiriman yang cepat, aman, dan tepat waktu.\n4. Menjalin kemitraan yang saling menguntungkan dengan mitra bisnis.\n5. Mengutamakan kepuasan dan kepercayaan pelanggan di setiap layanan.",
+                'body' => "Visi\nMenjadi perusahaan distributor terbesar, kompetitif, dan terpercaya di tingkat nasional maupun global. Menjadi mitra solusi distribusi produk berkualitas dengan pelayanan yang unggul dan tepat waktu.\n\nMisi\n1. Memberikan pelayanan yang optimal, profesional, dan inovatif demi kepuasan pelanggan.\n2. Memastikan ketepatan waktu pengiriman dan ketersediaan produk di setiap jaringan.\n3. Mengembangkan jaringan distribusi yang luas serta terintegrasi dengan teknologi.\n4. Menjalin kemitraan jangka panjang yang saling menguntungkan dengan prinsipal dan pelanggan.",
                 'sort_order' => 2,
             ],
         ];

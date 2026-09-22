@@ -1,5 +1,9 @@
 /.phpunit.cache
 /node_modules
+# Raw client-supplied asset dump — ProductSeeder copies the files it needs
+# from here into storage/app/public/products (which IS committed); this
+# folder itself is a messy source drop, not app code.
+/ALL PRODUK
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot
