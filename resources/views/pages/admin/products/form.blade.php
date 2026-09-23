@@ -121,7 +121,7 @@ new #[Title('Form Produk')] class extends Component
 }; ?>
 
 <div class="max-w-2xl">
-    <flux:heading size="xl">{{ $product ? __('Edit Produk') : __('Tambah Produk') }}</flux:heading>
+    <flux:heading size="xl" class="font-display">{{ $product ? __('Edit Produk') : __('Tambah Produk') }}</flux:heading>
 
     <form wire:submit="save" class="mt-6 space-y-6">
         <flux:input wire:model.live="name" label="{{ __('Nama Produk') }}" required />

@@ -92,7 +92,7 @@ new #[Title('Proses Gudang')] class extends Component
 
 <div class="flex w-full flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-4">
-        <flux:heading size="xl">{{ __('Proses Gudang') }}</flux:heading>
+        <flux:heading size="xl" class="font-display">{{ __('Proses Gudang') }}</flux:heading>
         <flux:button :href="route('admin.warehouse.export', ['status' => $status, 'search' => $search])">
             {{ __('Export Excel') }}
         </flux:button>

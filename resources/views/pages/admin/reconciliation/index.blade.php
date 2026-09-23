@@ -107,7 +107,7 @@ new #[Title('Rekonsiliasi')] class extends Component
 
 <div class="flex w-full flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-4">
-        <flux:heading size="xl">{{ __('Rekonsiliasi') }}</flux:heading>
+        <flux:heading size="xl" class="font-display">{{ __('Rekonsiliasi') }}</flux:heading>
         <div class="flex gap-2">
             <flux:button :href="route('admin.reconciliation.export', ['period' => $period, 'matchStatus' => $matchStatus])">
                 {{ __('Export Excel') }}

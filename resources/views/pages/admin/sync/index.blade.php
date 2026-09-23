@@ -42,7 +42,7 @@ new #[Title('Status Sinkronisasi')] class extends Component
 <div class="flex w-full flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
-            <flux:heading size="xl">{{ __('Status Sinkronisasi Shopee') }}</flux:heading>
+            <flux:heading size="xl" class="font-display">{{ __('Status Sinkronisasi Shopee') }}</flux:heading>
             <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                 {{ __('Mode saat ini:') }}
                 <span class="font-semibold {{ $this->mode === 'live' ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400' }}">

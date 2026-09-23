@@ -34,7 +34,7 @@ new #[Title('Kelola Pengguna')] class extends Component
 
 <div class="flex w-full flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-4">
-        <flux:heading size="xl">{{ __('Kelola Pengguna') }}</flux:heading>
+        <flux:heading size="xl" class="font-display">{{ __('Kelola Pengguna') }}</flux:heading>
         <flux:button variant="primary" :href="route('admin.users.create')" wire:navigate>
             {{ __('Tambah Pengguna') }}
         </flux:button>

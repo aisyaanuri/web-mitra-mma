@@ -52,7 +52,7 @@ new #[Title('Kelola Produk')] class extends Component
 
 <div class="flex w-full flex-col gap-4">
     <div class="flex flex-wrap items-center justify-between gap-4">
-        <flux:heading size="xl">{{ __('Kelola Produk') }}</flux:heading>
+        <flux:heading size="xl" class="font-display">{{ __('Kelola Produk') }}</flux:heading>
         <flux:button variant="primary" :href="route('admin.products.create')" wire:navigate>
             {{ __('Tambah Produk') }}
         </flux:button>

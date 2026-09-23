@@ -83,7 +83,7 @@ new #[Title('Form Pengguna')] class extends Component
 }; ?>
 
 <div class="max-w-xl">
-    <flux:heading size="xl">{{ $user ? __('Edit Pengguna') : __('Tambah Pengguna') }}</flux:heading>
+    <flux:heading size="xl" class="font-display">{{ $user ? __('Edit Pengguna') : __('Tambah Pengguna') }}</flux:heading>
 
     <form wire:submit="save" class="mt-6 space-y-6">
         <flux:input wire:model="name" label="{{ __('Nama') }}" required />

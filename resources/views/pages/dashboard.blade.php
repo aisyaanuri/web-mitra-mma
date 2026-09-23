@@ -87,16 +87,16 @@ new #[Title('Dashboard')] class extends Component
 }; ?>
 
 <div class="flex h-full w-full flex-1 flex-col gap-6">
-    <flux:heading size="xl">{{ __('Dashboard') }}</flux:heading>
+    <flux:heading size="xl" class="font-display">{{ __('Dashboard') }}</flux:heading>
 
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-            <p class="text-2xl font-bold text-zinc-900 dark:text-white">{{ $this->totalOrders }}</p>
+            <p class="font-display text-2xl text-zinc-900 dark:text-white">{{ $this->totalOrders }}</p>
             <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ __('Total Pesanan') }}</p>
         </div>
         @foreach (WarehouseStatus::cases() as $case)
             <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-                <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">{{ $this->warehouseBreakdown[$case->value] }}</p>
+                <p class="font-display text-2xl text-brand-600 dark:text-brand-400">{{ $this->warehouseBreakdown[$case->value] }}</p>
                 <p class="text-sm text-zinc-500 dark:text-zinc-400">{{ $case->label() }}</p>
             </div>
         @endforeach
@@ -104,7 +104,7 @@ new #[Title('Dashboard')] class extends Component
 
     @unless ($this->isGudangOnly)
         <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-            <flux:heading size="lg">{{ __('Penjualan 6 Bulan Terakhir') }}</flux:heading>
+            <flux:heading size="lg" class="font-display">{{ __('Penjualan 6 Bulan Terakhir') }}</flux:heading>
             <div
                 x-data
                 x-init="
@@ -112,7 +112,7 @@ new #[Title('Dashboard')] class extends Component
                         chart: { type: 'area', height: 300, toolbar: { show: false } },
                         series: [{ name: 'Penjualan', data: @js($this->salesChartData['data']) }],
                         xaxis: { categories: @js($this->salesChartData['labels']) },
-                        colors: ['#d97706'],
+                        colors: ['#1c7fc4'],
                         dataLabels: { enabled: false },
                         yaxis: { labels: { formatter: (val) => 'Rp ' + Number(val).toLocaleString('id-ID') } },
                         tooltip: { y: { formatter: (val) => 'Rp ' + Number(val).toLocaleString('id-ID') } },
@@ -126,23 +126,23 @@ new #[Title('Dashboard')] class extends Component
         </div>
 
         <div class="rounded-xl border border-zinc-200 p-4 dark:border-zinc-700">
-            <flux:heading size="lg">{{ __('Ringkasan Rekonsiliasi') }}</flux:heading>
+            <flux:heading size="lg" class="font-display">{{ __('Ringkasan Rekonsiliasi') }}</flux:heading>
             <div class="mt-4 grid gap-4 sm:grid-cols-3">
                 <div class="rounded-lg bg-green-50 p-4 dark:bg-green-950">
-                    <p class="text-xl font-bold text-green-700 dark:text-green-400">{{ $this->reconciliationBreakdown['sesuai'] }}</p>
+                    <p class="font-display text-xl text-green-700 dark:text-green-400">{{ $this->reconciliationBreakdown['sesuai'] }}</p>
                     <p class="text-sm text-green-700 dark:text-green-400">{{ __('Sesuai') }}</p>
                 </div>
                 <div class="rounded-lg bg-red-50 p-4 dark:bg-red-950">
-                    <p class="text-xl font-bold text-red-700 dark:text-red-400">{{ $this->reconciliationBreakdown['selisih'] }}</p>
+                    <p class="font-display text-xl text-red-700 dark:text-red-400">{{ $this->reconciliationBreakdown['selisih'] }}</p>
                     <p class="text-sm text-red-700 dark:text-red-400">{{ __('Selisih') }}</p>
                 </div>
                 <div class="rounded-lg bg-zinc-100 p-4 dark:bg-zinc-800">
-                    <p class="text-xl font-bold text-zinc-600 dark:text-zinc-300">{{ $this->reconciliationBreakdown['belum_dicek'] }}</p>
+                    <p class="font-display text-xl text-zinc-600 dark:text-zinc-300">{{ $this->reconciliationBreakdown['belum_dicek'] }}</p>
                     <p class="text-sm text-zinc-600 dark:text-zinc-300">{{ __('Belum Dicek') }}</p>
                 </div>
             </div>
-            <a href="{{ route('admin.reconciliation.index') }}" wire:navigate class="mt-4 inline-block text-sm font-semibold text-amber-600 hover:text-amber-700">
-                {{ __('Lihat Laporan Lengkap →') }}
+            <a href="{{ route('admin.reconciliation.index') }}" wire:navigate class="mt-4 inline-block text-sm font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                {{ __('Lihat Laporan Lengkap') }}
             </a>
         </div>
     @endunless
