@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ProductCategory;
 use App\Models\CompanyContent;
 use App\Models\Product;
 use App\Models\SiteSetting;
@@ -34,259 +35,259 @@ new #[Layout('layouts::public')] class extends Component
     #[Computed]
     public function featuredProducts()
     {
-        return Product::where('is_active', true)->where('is_featured', true)->with('images')->take(4)->get();
+        return Product::where('is_active', true)->where('is_featured', true)->with('images')->take(8)->get();
     }
 
-    /**
-     * @return array<int, string>
-     */
     #[Computed]
     public function distributionRegions(): array
     {
         return ['Jawa Timur', 'Sulawesi', 'Kalimantan', 'Timor Leste', 'Maluku', 'NTT', 'NTB', 'Bali'];
     }
 
-    /**
-     * @return array<int, array{name: string, desc: string}>
-     */
     #[Computed]
-    public function fleet(): array
+    public function yummyBitesCount(): int
     {
-        return [
-            ['name' => 'Truk Box Besar', 'desc' => 'Untuk pengiriman volume besar ke luar kota'],
-            ['name' => 'Truk Box Kecil', 'desc' => 'Untuk pengiriman rutin dalam kota'],
-        ];
+        return Product::where('is_active', true)->where('category', ProductCategory::YummyBites->value)->count();
     }
 
-    /**
-     * @return array<int, array{title: string, desc: string}>
-     */
     #[Computed]
-    public function differentiators(): array
+    public function berasImporCount(): int
     {
-        return [
-            ['title' => 'Distributor Resmi', 'desc' => 'Mitra resmi Yummy Bites & beras impor dari berbagai negara, bukan reseller.'],
-            ['title' => 'Armada Sendiri', 'desc' => 'Gratis ongkir untuk area Surabaya Raya tanpa bergantung ekspedisi pihak ketiga.'],
-            ['title' => '355+ Outlet', 'desc' => 'Jaringan distribusi aktif di 8 wilayah Indonesia bagian timur.'],
-            ['title' => 'Berpengalaman', 'desc' => 'Melayani mitra bisnis sejak 2019 dengan 18 tenaga ahli distribusi.'],
-        ];
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    #[Computed]
-    public function galleryPlaceholders(): array
-    {
-        return ['Gudang Kami', 'Tim Kami', 'Proses Packing', 'Booth Pameran', 'Armada Pengiriman'];
+        return Product::where('is_active', true)->where('category', ProductCategory::BerasImpor->value)->count();
     }
 }; ?>
 
 <div>
-    {{-- Hero: asymmetric split — headline left, "shipping manifest" fact card right --}}
-    <section class="relative overflow-hidden bg-brand-900">
-        <span class="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-brand-600/20 blur-3xl"></span>
+    {{-- ============================================================
+         SECTION 1: HERO — Full-width illustration background
+         Overlay gradien gelap di kiri agar teks terbaca.
+         Stats badge floating di atas gambar (seperti Gojek).
+         ============================================================ --}}
+    <section class="relative min-h-[520px] overflow-hidden sm:min-h-[600px] lg:min-h-[680px]">
+        <img
+            src="/images/illustrations/hero-distribusi.jpg"
+            alt="Ilustrasi gudang distribusi PT Mustika Makmur Abadi"
+            class="absolute inset-0 h-full w-full object-cover"
+            fetchpriority="high"
+        >
+        <div class="overlay-left absolute inset-0"></div>
 
-        <div class="relative mx-auto grid max-w-6xl gap-12 px-4 pb-24 pt-16 sm:px-6 sm:pt-20 lg:grid-cols-5 lg:items-center lg:gap-10">
-            <div class="lg:col-span-3" data-aos="fade-up">
-                <h1 class="heading-display font-display max-w-xl text-5xl font-bold text-white sm:text-6xl lg:text-7xl">
-                    {{ $this->hero?->title }}
+        <div class="relative z-10 mx-auto flex max-w-6xl flex-col justify-center px-4 py-20 sm:px-6 sm:py-28 lg:py-32">
+            <div class="max-w-xl reveal">
+                <h1 class="heading-display font-display text-4xl font-extrabold text-white sm:text-5xl lg:text-6xl">
+                    {{ $this->hero?->title ?? 'Distributor Resmi Yummy Bites & Beras Impor' }}
                 </h1>
-
-                <p class="mt-6 max-w-lg text-lg leading-relaxed text-brand-100">
-                    {{ $this->hero?->body }}
+                <p class="mt-5 max-w-md text-lg leading-relaxed text-white/85">
+                    {{ $this->hero?->body ?? 'Menyuplai 355+ outlet di 8 wilayah Indonesia bagian timur, langsung dari gudang di Sidoarjo.' }}
                 </p>
-
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="{{ route('tentang-kami') }}" wire:navigate class="rounded-full bg-white px-6 py-3.5 text-sm font-bold text-brand-800 shadow-lg shadow-black/10 transition hover:bg-brand-50">
-                        Tentang Kami
+                    <a href="{{ route('produk') }}" wire:navigate class="rounded-xl bg-sun-500 px-7 py-3.5 text-sm font-extrabold text-slate-900 shadow-lg shadow-sun-500/30 transition hover:bg-sun-400 hover:shadow-xl focus:ring-2 focus:ring-sun-300 focus:ring-offset-2 focus:ring-offset-brand-900 focus:outline-none">
+                        Lihat Katalog Produk
                     </a>
-                    <a href="{{ route('kontak') }}" wire:navigate class="rounded-full border border-white/25 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/10">
+                    <a href="{{ route('kontak') }}" wire:navigate class="rounded-xl border-2 border-white/40 bg-white/10 px-7 py-3.5 text-sm font-extrabold text-white backdrop-blur-sm transition hover:border-white/70 hover:bg-white/20 focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-brand-900 focus:outline-none">
                         Ajukan Kerja Sama
                     </a>
                 </div>
             </div>
 
-            <div class="lg:col-span-2" data-aos="zoom-in" data-aos-delay="150">
-                <div class="relative -rotate-2 rounded-2xl border border-brand-200 bg-parchment-50 p-6 text-brand-900 shadow-2xl shadow-black/40 sm:p-7">
-                    <div class="flex items-start justify-between gap-4 border-b border-dashed border-brand-300 pb-4">
-                        <div>
-                            <p class="font-display text-xl font-bold tracking-tight">Manifest Distribusi</p>
-                            <p class="mt-0.5 text-xs text-brand-600">PT Mustika Makmur Abadi &middot; Sidoarjo</p>
-                        </div>
-                        <span class="flex h-14 w-14 shrink-0 rotate-6 items-center justify-center rounded-full border-2 border-stamp-500 text-center text-[9px] leading-tight font-bold tracking-wide text-stamp-500 uppercase">
-                            Resmi<br>{{ SiteSetting::get('established_year') }}
-                        </span>
-                    </div>
-
-                    <dl class="mt-5 grid grid-cols-3 gap-4">
-                        <x-stat-counter :target="(int) SiteSetting::get('outlets_count', 0)" suffix="+" label="Outlet" number-class="font-display text-3xl text-brand-900" label-class="text-xs text-brand-600" />
-                        <x-stat-counter :target="(int) SiteSetting::get('staff_count', 0)" label="Tenaga Ahli" number-class="font-display text-3xl text-brand-900" label-class="text-xs text-brand-600" />
-                        <x-stat-counter :target="8" label="Wilayah" number-class="font-display text-3xl text-brand-900" label-class="text-xs text-brand-600" />
-                    </dl>
-
-                    <div class="mt-5 flex items-center justify-between border-t border-dashed border-brand-300 pt-4 text-xs text-brand-600">
-                        <span>Armada: 2 unit truk box</span>
-                        <span>Berdiri {{ SiteSetting::get('established_year') }}</span>
-                    </div>
+            {{-- Floating stat badges — integrated into hero --}}
+            <div class="mt-12 flex flex-wrap gap-3 reveal">
+                <div class="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-md">
+                    <p class="font-display text-2xl font-extrabold text-sun-400">{{ SiteSetting::get('established_year', '2019') }}</p>
+                    <p class="text-xs font-semibold text-white/70">Tahun Berdiri</p>
+                </div>
+                <div class="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-md">
+                    <p class="font-display text-2xl font-extrabold text-sun-400">{{ SiteSetting::get('outlets_count', '355') }}+</p>
+                    <p class="text-xs font-semibold text-white/70">Outlet Aktif</p>
+                </div>
+                <div class="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-md">
+                    <p class="font-display text-2xl font-extrabold text-sun-400">8</p>
+                    <p class="text-xs font-semibold text-white/70">Wilayah Distribusi</p>
                 </div>
             </div>
         </div>
-
-        <x-section-wave color="text-white dark:text-zinc-900" />
     </section>
 
-    {{-- Sarana Distribusi + Armada --}}
-    @if ($this->distribusi)
-        <section class="bg-white pt-16 dark:bg-zinc-900">
-            <div class="mx-auto max-w-6xl px-4 sm:px-6">
-                <div class="grid gap-10 lg:grid-cols-5 lg:gap-16">
-                    <div class="lg:col-span-2" data-aos="fade-up">
-                        <h2 class="heading-display font-display text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-white">{{ $this->distribusi->title }}</h2>
-                        <p class="mt-4 text-zinc-600 dark:text-zinc-400">{{ $this->distribusi->body }}</p>
-
-                        <dl class="mt-8 space-y-5 border-t border-zinc-100 pt-6 dark:border-zinc-800">
-                            <div>
-                                <dt class="text-xs font-semibold tracking-wide text-zinc-400">Gratis Ongkir</dt>
-                                <dd class="mt-1 text-sm font-medium text-zinc-800 dark:text-zinc-200">{{ SiteSetting::get('distribution_free_area') }}</dd>
-                            </div>
-                            <div>
-                                <dt class="text-xs font-semibold tracking-wide text-zinc-400">Jadwal Pengiriman</dt>
-                                <dd class="mt-1 text-sm font-medium text-zinc-800 dark:text-zinc-200">Senin – Sabtu</dd>
-                            </div>
-                        </dl>
-                    </div>
-
-                    <div class="lg:col-span-3" data-aos="fade-up" data-aos-delay="100">
-                        <p class="font-display text-lg font-bold text-zinc-900 dark:text-white">Armada Kami</p>
-                        <div class="mt-2 divide-y divide-zinc-100 border-y border-zinc-100 dark:divide-zinc-800 dark:border-zinc-800">
-                            @foreach ($this->fleet as $vehicle)
-                                <div class="flex items-center gap-5 py-5">
-                                    <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/50 dark:text-brand-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5V6a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v10.5M3 16.5h11M3 16.5H1.5M14 16.5h2.5m0 0H20a1 1 0 0 0 1-1v-3.4a1 1 0 0 0-.29-.7l-2.6-2.6a1 1 0 0 0-.7-.3H16.5m0 8v-8" />
-                                            <circle cx="6.5" cy="18" r="1.75" />
-                                            <circle cx="17.5" cy="18" r="1.75" />
-                                        </svg>
-                                    </span>
-                                    <div>
-                                        <p class="font-bold text-zinc-900 dark:text-white">{{ $vehicle['name'] }}</p>
-                                        <p class="mt-0.5 text-sm text-zinc-600 dark:text-zinc-400">{{ $vehicle['desc'] }}</p>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Jangkauan Distribusi: routing list, not a badge grid --}}
-                <div class="mt-16 border-t border-zinc-100 py-16 dark:border-zinc-800" data-aos="fade-up">
-                    <h2 class="heading-display font-display text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-white">Jangkauan Distribusi</h2>
-                    <p class="mt-3 max-w-xl text-zinc-600 dark:text-zinc-400">
-                        Dari pusat distribusi di <span class="font-semibold text-brand-700 dark:text-brand-400">Sidoarjo</span>, produk kami menjangkau outlet modern & tradisional di:
-                    </p>
-
-                    <div class="route-line mt-6 text-brand-200 dark:text-brand-800"></div>
-
-                    <div class="mt-6 grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-4">
-                        @foreach ($this->distributionRegions as $region)
-                            <div class="flex items-center gap-2.5">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-brand-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4.5-4.2-7-7.9-7-11a7 7 0 1 1 14 0c0 3.1-2.5 6.8-7 11Z" />
-                                    <circle cx="12" cy="10" r="2.5" />
-                                </svg>
-                                <span class="font-medium text-zinc-800 dark:text-zinc-200">{{ $region }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+    {{-- ============================================================
+         SECTION 2: YUMMY BITES — Split 50/50, illustration left
+         Background oranye-kuning di kanan. Tidak ada border/kotak.
+         ============================================================ --}}
+    <section class="overflow-hidden">
+        <div class="grid lg:grid-cols-2">
+            <div class="relative min-h-[360px] lg:min-h-[480px]">
+                <img
+                    src="/images/illustrations/yummy-bites.jpg"
+                    alt="Ilustrasi ibu dan bayi menikmati snack Yummy Bites"
+                    class="absolute inset-0 h-full w-full object-cover"
+                    loading="lazy"
+                >
             </div>
-        </section>
-    @endif
+            <div class="flex flex-col justify-center bg-gradient-to-br from-sun-500 to-coral-500 px-8 py-14 sm:px-12 lg:px-16 lg:py-20 reveal">
+                <span class="inline-block w-fit rounded-lg bg-white/20 px-3 py-1 text-xs font-bold text-white">MPASI & Snack Bayi</span>
+                <h2 class="heading-display font-display mt-4 text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">Yummy Bites</h2>
+                <p class="mt-4 max-w-md text-lg leading-relaxed text-white/90">
+                    Camilan MPASI untuk si kecil usia 6 bulan+ hingga 1 tahun+. {{ $this->yummyBitesCount }} produk aktif. Distributor resmi, bukan reseller.
+                </p>
+                <a href="{{ route('produk', ['category' => 'yummy_bites']) }}" wire:navigate class="mt-8 inline-flex w-fit items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-extrabold text-slate-900 shadow-lg transition hover:bg-slate-50 hover:shadow-xl">
+                    Lihat Produk Yummy Bites
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" /></svg>
+                </a>
+            </div>
+        </div>
+    </section>
 
-    {{-- Kenapa Memilih Kami: manifest-style spec list --}}
-    <section class="border-t border-zinc-100 bg-zinc-50 py-16 dark:border-zinc-800 dark:bg-zinc-950">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6" data-aos="fade-up">
-            <h2 class="heading-display font-display text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-white">Kenapa Memilih Kami</h2>
+    {{-- ============================================================
+         SECTION 3: BERAS IMPOR — Split 50/50 terbalik (mirrored)
+         Background biru tua di kiri, ilustrasi sawah di kanan.
+         ============================================================ --}}
+    <section class="overflow-hidden">
+        <div class="grid lg:grid-cols-2">
+            <div class="flex flex-col justify-center bg-gradient-brand px-8 py-14 sm:px-12 lg:order-first lg:px-16 lg:py-20 reveal">
+                <span class="inline-block w-fit rounded-lg bg-white/15 px-3 py-1 text-xs font-bold text-white">Beras Premium</span>
+                <h2 class="heading-display font-display mt-4 text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">Beras Impor</h2>
+                <p class="mt-4 max-w-md text-lg leading-relaxed text-white/90">
+                    Beras impor pilihan dari Jepang, Korea, India, Vietnam, dan Thailand. {{ $this->berasImporCount }} produk aktif, untuk kebutuhan restoran dan hotel.
+                </p>
+                <a href="{{ route('produk', ['category' => 'beras_impor']) }}" wire:navigate class="mt-8 inline-flex w-fit items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-extrabold text-brand-700 shadow-lg transition hover:bg-brand-50 hover:shadow-xl">
+                    Lihat Produk Beras Impor
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" /></svg>
+                </a>
+            </div>
+            <div class="relative min-h-[360px] lg:min-h-[480px]">
+                <img
+                    src="/images/illustrations/beras-impor.jpg"
+                    alt="Ilustrasi sawah padi dan beras impor dari berbagai negara"
+                    class="absolute inset-0 h-full w-full object-cover"
+                    loading="lazy"
+                >
+            </div>
+        </div>
+    </section>
 
-            <div class="mt-8 divide-y divide-zinc-200 border-y-2 border-zinc-900 dark:divide-zinc-800 dark:border-white">
-                @foreach ($this->differentiators as $item)
-                    <div class="grid gap-1.5 py-6 sm:grid-cols-4 sm:items-center sm:gap-6">
-                        <p class="font-display text-xl font-bold text-zinc-900 dark:text-white">{{ $item['title'] }}</p>
-                        <p class="text-zinc-600 sm:col-span-3 dark:text-zinc-400">{{ $item['desc'] }}</p>
-                    </div>
+    {{-- ============================================================
+         SECTION 4: JANGKAUAN DISTRIBUSI — Map illustration background
+         Overlay gradient + teks putih. Wilayah sebagai chip/tag.
+         ============================================================ --}}
+    <section class="relative min-h-[480px] overflow-hidden sm:min-h-[520px]">
+        <img
+            src="/images/illustrations/peta-distribusi.jpg"
+            alt="Peta distribusi PT Mustika Makmur Abadi di Indonesia bagian timur"
+            class="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+        >
+        <div class="overlay-bottom absolute inset-0"></div>
+
+        <div class="relative z-10 mx-auto flex max-w-6xl flex-col justify-end px-4 py-14 sm:px-6 sm:py-20">
+            <div class="reveal">
+                <h2 class="heading-display font-display text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">
+                    {{ $this->distribusi?->title ?? 'Jangkauan Distribusi' }}
+                </h2>
+                <p class="mt-3 max-w-lg text-lg text-white/85">
+                    {{ $this->distribusi?->body ?? 'Dari pusat distribusi di Sidoarjo, produk kami menjangkau 8 wilayah Indonesia bagian timur.' }}
+                </p>
+            </div>
+
+            <div class="mt-8 flex flex-wrap gap-2 reveal">
+                @foreach ($this->distributionRegions as $region)
+                    <span class="rounded-lg bg-white/20 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm">{{ $region }}</span>
                 @endforeach
             </div>
+
+            <div class="mt-6 flex flex-wrap gap-6 reveal">
+                @if ($freeArea = SiteSetting::get('distribution_free_area'))
+                    <div class="rounded-xl bg-sun-500/90 px-5 py-3 backdrop-blur-sm">
+                        <p class="text-sm font-extrabold text-slate-900">Gratis Ongkir</p>
+                        <p class="text-xs text-slate-800">{{ $freeArea }}</p>
+                    </div>
+                @endif
+                <div class="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-sm">
+                    <p class="text-sm font-extrabold text-white">Senin – Sabtu</p>
+                    <p class="text-xs text-white/70">Jadwal Pengiriman</p>
+                </div>
+                <div class="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-sm">
+                    <p class="text-sm font-extrabold text-white">2 Unit Truk Box</p>
+                    <p class="text-xs text-white/70">Armada Sendiri</p>
+                </div>
+            </div>
         </div>
     </section>
 
-    {{-- Produk Unggulan --}}
-    @if ($this->featuredProducts->isNotEmpty())
-        <section class="py-16">
-            <div class="mx-auto max-w-6xl px-4 sm:px-6" data-aos="fade-up">
-                <div class="flex flex-wrap items-end justify-between gap-4">
-                    <h2 class="heading-display font-display text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-white">Produk Unggulan</h2>
-                    <a href="{{ route('produk') }}" wire:navigate class="text-sm font-bold text-brand-600 hover:text-brand-700 dark:text-brand-400">
-                        Lihat Semua Produk
+    {{-- ============================================================
+         SECTION 5: PRODUK UNGGULAN — Gradient sky background + carousel
+         ============================================================ --}}
+    @if ($this->featuredProducts->count() > 0)
+        <section class="bg-gradient-sky py-16 sm:py-20 dark:bg-zinc-900">
+            <div class="mx-auto max-w-6xl px-4 sm:px-6">
+                <div class="flex flex-wrap items-end justify-between gap-4 reveal">
+                    <div>
+                        <h2 class="heading-display font-display text-3xl font-extrabold text-slate-900 sm:text-4xl dark:text-white">Produk Unggulan</h2>
+                        <p class="mt-2 text-slate-600 dark:text-zinc-400">Pilihan terbaik dari katalog kami</p>
+                    </div>
+                    <a href="{{ route('produk') }}" wire:navigate class="text-sm font-extrabold text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                        Lihat Semua →
                     </a>
                 </div>
 
-                <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                    @foreach ($this->featuredProducts as $product)
-                        <div class="overflow-hidden rounded-xl border border-zinc-100 bg-white transition hover:border-brand-200 dark:border-zinc-800 dark:bg-zinc-900">
-                            <div class="flex aspect-square items-center justify-center bg-zinc-50 dark:bg-zinc-800">
-                                @if ($product->images->isNotEmpty())
-                                    <img src="{{ $product->images->first()->url() }}" alt="{{ $product->images->first()->alt_text ?? $product->name }}" class="h-full w-full object-contain p-4">
-                                @else
-                                    <span class="font-display text-4xl text-brand-300">{{ mb_substr($product->name, 0, 1) }}</span>
-                                @endif
+                <div class="swiper mt-10 reveal" x-data x-init="
+                    new Swiper($el, {
+                        modules: [SwiperModules.Navigation, SwiperModules.Pagination],
+                        slidesPerView: 1.2,
+                        spaceBetween: 16,
+                        grabCursor: true,
+                        pagination: { el: $el.querySelector('.swiper-pagination'), clickable: true },
+                        breakpoints: {
+                            640: { slidesPerView: 2.2, spaceBetween: 20 },
+                            1024: { slidesPerView: 3.5, spaceBetween: 24 },
+                        }
+                    })
+                ">
+                    <div class="swiper-wrapper">
+                        @foreach ($this->featuredProducts as $product)
+                            <div class="swiper-slide">
+                                <div class="overflow-hidden rounded-2xl bg-white shadow-md shadow-slate-200/50 transition hover:shadow-xl dark:bg-zinc-800 dark:shadow-none">
+                                    <div class="flex aspect-square items-center justify-center bg-slate-50 dark:bg-zinc-700/50">
+                                        @if ($product->images->isNotEmpty())
+                                            <img src="{{ $product->images->first()->url() }}" alt="{{ $product->images->first()->alt_text ?? $product->name }}" class="h-full w-full object-contain p-4" loading="lazy">
+                                        @else
+                                            <span class="font-display text-5xl font-bold text-brand-200">{{ mb_substr($product->name, 0, 1) }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="p-5">
+                                        <p class="font-bold text-slate-900 dark:text-white">{{ $product->name }}</p>
+                                        <span class="mt-2 inline-block rounded-lg bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700 dark:bg-brand-900/50 dark:text-brand-300">
+                                            {{ $product->category->label() }}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="p-4">
-                                <p class="text-sm font-bold text-zinc-900 dark:text-white">{{ $product->name }}</p>
-                                <span class="mt-1.5 inline-block rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
-                                    {{ $product->category->label() }}
-                                </span>
-                            </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
+                    <div class="swiper-pagination mt-8 !relative"></div>
                 </div>
             </div>
         </section>
     @endif
 
-    {{-- Galeri --}}
-    <section class="border-t border-zinc-100 bg-zinc-50 py-16 dark:border-zinc-800 dark:bg-zinc-950">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6" data-aos="fade-up">
-            <h2 class="heading-display font-display text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-white">Galeri</h2>
-            <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Sekilas aktivitas dan fasilitas kami — foto asli menyusul.</p>
+    {{-- ============================================================
+         SECTION 6: CTA PENUTUP — Gradient oranye bold + pattern
+         ============================================================ --}}
+    <section class="bg-gradient-sun relative overflow-hidden">
+        {{-- Decorative circles --}}
+        <div class="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-white/10" aria-hidden="true"></div>
+        <div class="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-white/10" aria-hidden="true"></div>
 
-            <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
-                @foreach ($this->galleryPlaceholders as $index => $item)
-                    <div class="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-brand-200 bg-white text-center dark:border-brand-800 dark:bg-zinc-900 {{ $index === 0 ? 'col-span-2 aspect-[2/1] sm:col-span-1 sm:row-span-2 sm:aspect-auto' : 'aspect-square' }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-brand-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <rect x="3" y="5" width="18" height="14" rx="2" />
-                            <circle cx="8.5" cy="10" r="1.5" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 15-5-5-9 9" />
-                        </svg>
-                        <span class="px-3 text-xs font-semibold text-zinc-700 dark:text-zinc-300">{{ $item }}</span>
-                        <span class="text-[10px] text-zinc-400">Foto segera hadir</span>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </section>
-
-    {{-- CTA Penutup --}}
-    <section class="bg-brand-900">
-        <div class="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6" data-aos="fade-up">
-            <h2 class="heading-display font-display text-3xl font-bold text-white sm:text-4xl">Tertarik Menjadi Mitra Kami?</h2>
-            <p class="mt-4 text-brand-100">Hubungi kami untuk informasi kerja sama distribusi Yummy Bites dan beras impor.</p>
-            <div class="mt-8 flex flex-wrap justify-center gap-3">
-                <a href="{{ route('kontak') }}" wire:navigate class="rounded-full bg-white px-7 py-3.5 text-sm font-bold text-brand-800 shadow-lg shadow-black/10 transition hover:bg-brand-50">
-                    Hubungi Kami
-                </a>
-                <a href="{{ route('produk') }}" wire:navigate class="rounded-full border border-white/25 px-7 py-3.5 text-sm font-bold text-white transition hover:bg-white/10">
-                    Lihat Produk
+        <div class="relative z-10 mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-20 reveal">
+            <h2 class="heading-display font-display text-3xl font-extrabold text-slate-900 sm:text-4xl lg:text-5xl">Tertarik Menjadi Mitra Kami?</h2>
+            <p class="mx-auto mt-4 max-w-lg text-lg text-slate-800/80">Hubungi kami untuk informasi kerja sama distribusi Yummy Bites dan beras impor di wilayah Anda.</p>
+            <div class="mt-10 flex flex-wrap justify-center gap-4">
+                @if ($whatsapp = SiteSetting::get('whatsapp_number'))
+                    <a href="https://wa.me/{{ $whatsapp }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2.5 rounded-xl bg-slate-900 px-8 py-4 text-sm font-extrabold text-white shadow-xl transition hover:bg-slate-800 focus:ring-2 focus:ring-slate-700 focus:ring-offset-2 focus:ring-offset-sun-500 focus:outline-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.44 9.9-9.9 0-2.64-1.03-5.12-2.9-6.99A9.82 9.82 0 0 0 12.04 2zm5.8 14.07c-.24.68-1.4 1.3-1.93 1.36-.5.06-1 .27-3.36-.7-2.84-1.17-4.66-4.05-4.8-4.24-.14-.19-1.15-1.53-1.15-2.92s.72-2.06.98-2.35c.26-.29.56-.36.75-.36h.54c.17 0 .4-.03.62.48.24.56.8 1.95.87 2.09.07.14.11.3.02.49-.09.19-.14.3-.28.46-.14.16-.29.36-.42.48-.14.13-.29.28-.12.55.17.28.75 1.24 1.61 2.01 1.11 1 2.04 1.31 2.32 1.46.28.14.44.12.6-.07.17-.19.72-.84.91-1.13.19-.28.38-.23.63-.14.26.09 1.65.78 1.93.92.28.14.47.21.54.33.07.12.07.68-.17 1.36z"/></svg>
+                        Hubungi via WhatsApp
+                    </a>
+                @endif
+                <a href="{{ route('kontak') }}" wire:navigate class="rounded-xl bg-white px-8 py-4 text-sm font-extrabold text-slate-900 shadow-xl transition hover:bg-slate-50 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-sun-500 focus:outline-none">
+                    Kirim Pesan
                 </a>
             </div>
         </div>

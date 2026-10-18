@@ -4,7 +4,7 @@
     'label',
     'duration' => 1500,
     'numberClass' => 'text-brand-600 dark:text-brand-300',
-    'labelClass' => 'text-zinc-500 dark:text-zinc-400',
+    'labelClass' => 'text-slate-500 dark:text-zinc-400',
 ])
 
 <div

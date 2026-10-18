@@ -14,10 +14,10 @@ new #[Layout('layouts::public')] class extends Component
 }; ?>
 
 <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-    <h1 class="text-3xl font-bold text-zinc-900 dark:text-white">Kebijakan Privasi</h1>
-    <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">Terakhir diperbarui: {{ now()->translatedFormat('d F Y') }}</p>
+    <h1 class="font-display text-3xl font-bold text-slate-900 dark:text-white">Kebijakan Privasi</h1>
+    <p class="mt-2 text-sm text-slate-500 dark:text-zinc-400">Terakhir diperbarui: {{ now()->translatedFormat('d F Y') }}</p>
 
-    <div class="mt-8 space-y-6 text-zinc-600 dark:text-zinc-400">
+    <div class="mt-8 space-y-6 text-slate-600 dark:text-zinc-400">
         <section>
             <h2 class="text-lg font-semibold text-zinc-900 dark:text-white">1. Data yang Kami Kumpulkan</h2>
             <p class="mt-2">

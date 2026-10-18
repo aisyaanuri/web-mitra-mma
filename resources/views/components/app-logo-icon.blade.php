@@ -1,1 +1,5 @@
-<span {{ $attributes->merge(['class' => 'font-display flex items-center justify-center text-[9px] leading-none font-bold tracking-tight']) }}>MMA</span>
+<img
+    src="{{ asset('images/logo-mustika-square.png') }}"
+    alt="{{ config('app.name', 'PT Mustika Makmur Abadi') }}"
+    {{ $attributes->except(['fill-current'])->merge(['class' => 'rounded-md object-contain']) }}
+/>

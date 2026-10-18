@@ -29,9 +29,7 @@ new #[Layout('layouts::public')] class extends Component
         return CompanyContent::section('tentang_kami_visi_misi');
     }
 
-    /**
-     * @return array<int, string>
-     */
+    /** @return array<int, string> */
     #[Computed]
     public function misiPoints(): array
     {
@@ -56,9 +54,7 @@ new #[Layout('layouts::public')] class extends Component
         return isset($matches[1]) ? trim($matches[1]) : null;
     }
 
-    /**
-     * @return array<int, array{year: string, title: string, desc: string}>
-     */
+    /** @return array<int, array{year: string, title: string, desc: string}> */
     #[Computed]
     public function timeline(): array
     {
@@ -75,81 +71,98 @@ new #[Layout('layouts::public')] class extends Component
             ],
         ];
     }
+
+    /** @return array<int, array{title: string, desc: string}> */
+    #[Computed]
+    public function differentiators(): array
+    {
+        return [
+            ['title' => 'Distributor Resmi', 'desc' => 'Mitra resmi Yummy Bites & beras impor dari berbagai negara, bukan reseller.'],
+            ['title' => 'Armada Sendiri', 'desc' => 'Gratis ongkir untuk area Surabaya Raya tanpa bergantung ekspedisi pihak ketiga.'],
+            ['title' => '355+ Outlet', 'desc' => 'Jaringan distribusi aktif di 8 wilayah Indonesia bagian timur.'],
+            ['title' => 'Berpengalaman', 'desc' => 'Melayani mitra bisnis sejak 2019 dengan 18 tenaga ahli distribusi.'],
+        ];
+    }
 }; ?>
 
 <div>
-    {{-- Hero --}}
-    <section class="bg-brand-900">
-        <div class="mx-auto max-w-5xl px-4 py-20 sm:px-6" data-aos="fade-up">
-            <h1 class="heading-display font-display max-w-2xl text-4xl font-bold text-white sm:text-5xl">
-                {{ $this->content?->title ?? 'Tentang Kami' }}
-            </h1>
-            <div class="mt-6 max-w-2xl space-y-4 whitespace-pre-line text-brand-100">
+    {{-- ============================================================
+         SECTION 1: HERO — Team illustration background with overlay
+         ============================================================ --}}
+    <section class="relative min-h-[400px] overflow-hidden sm:min-h-[480px]">
+        <img
+            src="/images/illustrations/tim-mustika.jpg"
+            alt="Ilustrasi tim PT Mustika Makmur Abadi"
+            class="absolute inset-0 h-full w-full object-cover object-top"
+            fetchpriority="high"
+        >
+        <div class="overlay-left absolute inset-0"></div>
+
+        <div class="relative z-10 mx-auto flex max-w-5xl flex-col justify-center px-4 py-20 sm:px-6 sm:py-28">
+            <div class="max-w-lg reveal">
+                <h1 class="heading-display font-display text-4xl font-extrabold text-white sm:text-5xl lg:text-6xl">
+                    {{ $this->content?->title ?? 'Tentang Kami' }}
+                </h1>
+                <p class="mt-5 text-lg leading-relaxed text-white/85">
+                    {{ Str::limit($this->content?->body, 200) }}
+                </p>
+            </div>
+        </div>
+    </section>
+
+    {{-- ============================================================
+         SECTION 2: PROFIL LENGKAP — Full text on light background
+         ============================================================ --}}
+    <section class="py-14 sm:py-20 dark:bg-zinc-900">
+        <div class="mx-auto max-w-3xl px-4 sm:px-6 reveal">
+            <div class="space-y-4 whitespace-pre-line text-lg leading-relaxed text-slate-600 dark:text-zinc-300">
                 {{ $this->content?->body }}
             </div>
         </div>
     </section>
 
-    {{-- Stats strip overlapping hero --}}
-    <div class="relative z-10 mx-auto -mt-8 max-w-5xl px-4 sm:px-6" data-aos="fade-up" data-aos-delay="100">
-        <div class="grid grid-cols-3 divide-x divide-zinc-100 rounded-2xl bg-white shadow-xl shadow-brand-900/10 dark:divide-zinc-800 dark:bg-zinc-900">
-            <div class="px-3 py-6 text-center sm:px-8">
-                <p class="font-display text-3xl text-brand-600 sm:text-4xl dark:text-brand-300">{{ SiteSetting::get('established_year') }}</p>
-                <p class="mt-1 text-xs font-medium text-zinc-500 sm:text-sm dark:text-zinc-400">Tahun Berdiri</p>
-            </div>
-            <x-stat-counter :target="(int) SiteSetting::get('outlets_count', 0)" suffix="+" label="Outlet Terjangkau" number-class="font-display text-3xl text-brand-600 dark:text-brand-300" class="px-3 py-6 text-center sm:px-8" />
-            <x-stat-counter :target="(int) SiteSetting::get('staff_count', 0)" label="Tenaga Ahli Distribusi" number-class="font-display text-3xl text-brand-600 dark:text-brand-300" class="px-3 py-6 text-center sm:px-8" />
-        </div>
-    </div>
+    {{-- ============================================================
+         SECTION 3: TIMELINE — Brand gradient background
+         ============================================================ --}}
+    <section class="bg-gradient-brand py-16 sm:py-20">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 reveal">
+            <h2 class="heading-display font-display text-2xl font-extrabold text-white sm:text-3xl">Perjalanan Kami</h2>
 
-    {{-- Timeline --}}
-    <section class="mx-auto max-w-5xl px-4 py-20 sm:px-6">
-        <div class="grid gap-10 lg:grid-cols-3 lg:gap-16">
-            <div data-aos="fade-up">
-                <h2 class="heading-display font-display text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-white">Perjalanan Kami</h2>
-                <p class="mt-3 text-sm text-zinc-500 dark:text-zinc-400">Dari usaha distribusi rintisan menjadi jaringan yang menjangkau Indonesia bagian timur.</p>
-            </div>
-
-            <div class="lg:col-span-2">
-                <div class="space-y-10 border-l-2 border-brand-200 pl-8 dark:border-brand-800">
-                    @foreach ($this->timeline as $index => $milestone)
-                        <div class="relative" data-aos="fade-up" data-aos-delay="{{ $index * 100 }}">
-                            <span class="absolute -left-[2.15rem] flex h-5 w-5 items-center justify-center rounded-full bg-brand-500 ring-4 ring-white dark:ring-zinc-900"></span>
-                            <p class="font-display text-lg text-brand-600 dark:text-brand-400">{{ $milestone['year'] }}</p>
-                            <p class="mt-1 text-xl font-bold text-zinc-900 dark:text-white">{{ $milestone['title'] }}</p>
-                            <p class="mt-2 max-w-lg text-zinc-600 dark:text-zinc-400">{{ $milestone['desc'] }}</p>
-                        </div>
-                    @endforeach
-                </div>
+            <div class="mt-10 grid gap-6 sm:grid-cols-2">
+                @foreach ($this->timeline as $milestone)
+                    <div class="rounded-2xl bg-white/10 p-6 backdrop-blur-sm">
+                        <p class="font-display text-3xl font-extrabold text-sun-400">{{ $milestone['year'] }}</p>
+                        <p class="mt-2 text-xl font-bold text-white">{{ $milestone['title'] }}</p>
+                        <p class="mt-3 leading-relaxed text-white/80">{{ $milestone['desc'] }}</p>
+                    </div>
+                @endforeach
             </div>
         </div>
     </section>
 
-    {{-- Visi & Misi --}}
+    {{-- ============================================================
+         SECTION 4: VISI & MISI — Split visual
+         ============================================================ --}}
     @if ($this->visiMisi)
-        <section class="border-t border-zinc-100 bg-zinc-50 py-20 dark:border-zinc-800 dark:bg-zinc-950">
+        <section class="py-16 sm:py-20 dark:bg-zinc-900">
             <div class="mx-auto max-w-5xl px-4 sm:px-6">
-                <h2 class="heading-display font-display text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-white" data-aos="fade-up">{{ $this->visiMisi->title }}</h2>
+                <h2 class="heading-display font-display text-2xl font-extrabold text-slate-900 sm:text-3xl dark:text-white reveal">{{ $this->visiMisi->title }}</h2>
 
                 <div class="mt-10 grid gap-6 lg:grid-cols-5">
-                    <div class="rounded-2xl bg-brand-800 p-8 text-white lg:col-span-2" data-aos="fade-up">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-brand-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                            <circle cx="12" cy="12" r="3" />
-                        </svg>
-                        <p class="font-display mt-4 text-lg font-bold">Visi</p>
-                        <p class="mt-3 text-lg leading-relaxed font-medium">{{ $this->visiText }}</p>
+                    <div class="overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 to-brand-800 p-8 text-white lg:col-span-2 reveal">
+                        <p class="font-display text-xl font-extrabold">Visi</p>
+                        <p class="mt-4 text-lg leading-relaxed text-brand-100">{{ $this->visiText }}</p>
                     </div>
 
-                    <div class="rounded-2xl border border-zinc-200 bg-white p-8 lg:col-span-3 dark:border-zinc-800 dark:bg-zinc-900" data-aos="fade-up" data-aos-delay="100">
-                        <p class="font-display text-lg font-bold text-zinc-900 dark:text-white">Misi</p>
+                    <div class="rounded-2xl border border-slate-200 bg-white p-8 lg:col-span-3 reveal dark:border-zinc-700 dark:bg-zinc-800">
+                        <p class="font-display text-xl font-extrabold text-slate-900 dark:text-white">Misi</p>
                         <ul class="mt-4 space-y-3">
                             @foreach ($this->misiPoints as $point)
                                 <li class="flex gap-3">
-                                    <span class="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-900/50 dark:text-brand-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+                                    <span class="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-mint-500 text-white">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
                                     </span>
-                                    <span class="text-zinc-700 dark:text-zinc-300">{{ $point }}</span>
+                                    <span class="text-slate-700 dark:text-zinc-300">{{ $point }}</span>
                                 </li>
                             @endforeach
                         </ul>
@@ -158,4 +171,22 @@ new #[Layout('layouts::public')] class extends Component
             </div>
         </section>
     @endif
+
+    {{-- ============================================================
+         SECTION 5: KENAPA MUSTIKA — Sun gradient background
+         ============================================================ --}}
+    <section class="bg-gradient-to-br from-sun-500 to-coral-500 py-16 sm:py-20">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 reveal">
+            <h2 class="heading-display font-display text-2xl font-extrabold text-white sm:text-3xl">Kenapa Memilih Kami</h2>
+
+            <div class="mt-8 grid gap-4 sm:grid-cols-2 reveal-stagger">
+                @foreach ($this->differentiators as $item)
+                    <div class="rounded-2xl bg-white/15 p-6 backdrop-blur-sm reveal">
+                        <p class="font-display text-xl font-extrabold text-white">{{ $item['title'] }}</p>
+                        <p class="mt-2 leading-relaxed text-white/85">{{ $item['desc'] }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
 </div>

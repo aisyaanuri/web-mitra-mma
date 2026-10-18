@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 @import '../../vendor/livewire/flux/dist/flux.css';
-@import 'aos/dist/aos.css';
 @import 'swiper/css';
 @import 'swiper/css/navigation';
 @import 'swiper/css/pagination';
@@ -14,12 +13,7 @@
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-
-    /* "Manifest" design concept (Fase 14): a condensed, industrial display
-    face for headings and large numerals — evokes shipping-crate stencils
-    and port signage, deliberately distinct from the humanist body face.
-    Used for headings/stats, never for body copy. */
-    --font-display: 'Big Shoulders Display', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
 
     --color-zinc-50: #fafafa;
     --color-zinc-100: #f5f5f5;
@@ -33,43 +27,49 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    /* Flux UI's accent token, retheme to brand blue (login/admin — the
-    public site doesn't use Flux) so primary buttons/checkboxes/focus
-    rings match the "Manifest" identity instead of generic neutral/black. */
+    /* Flux UI accent for admin panel */
     --color-accent: var(--color-brand-600);
     --color-accent-content: var(--color-brand-600);
     --color-accent-foreground: var(--color-white);
 
-    /* Brand palette derived from the client's real logo (ocean-blue circular
-    badge with a whale motif). Concept name: "Manifest" — a distributor
-    that ships imported goods (rice) across the archipelago, styled after
-    shipping manifests and nautical charts rather than generic SaaS blue. */
-    --color-brand-50: #eff8ff;
-    --color-brand-100: #dbeeff;
-    --color-brand-200: #b8dcff;
-    --color-brand-300: #85c4ff;
-    --color-brand-400: #38a6e0;
-    --color-brand-500: #1c7fc4;
-    --color-brand-600: #145c99;
-    --color-brand-700: #0d3d66;
-    --color-brand-800: #092a47;
-    --color-brand-900: #062136;
+    /* Brand blue — upgraded to more vivid "electric" blue */
+    --color-brand-50:  #e8f4ff;
+    --color-brand-100: #d0e8ff;
+    --color-brand-200: #a3d4ff;
+    --color-brand-300: #5cb5ff;
+    --color-brand-400: #2196ff;
+    --color-brand-500: #2979ff;
+    --color-brand-600: #2962ff;
+    --color-brand-700: #1a47cc;
+    --color-brand-800: #0d3199;
+    --color-brand-900: #0a1f4d;
 
-    /* Warm chart-paper surface — replaces flat white as the secondary
-    section background on the public site, evoking aged nautical chart
-    paper rather than a default SaaS off-white. */
-    --color-parchment-50: #fbfaf6;
-    --color-parchment-100: #f4f1e6;
-    --color-parchment-200: #eae4d0;
+    /* Sun accent — warmer, more amber-gold (appetite-triggering) */
+    --color-sun-300: #ffd54f;
+    --color-sun-400: #ffca28;
+    --color-sun-500: #ffab00;
+    --color-sun-600: #ff8f00;
 
-    /* Ink-stamp accent — used sparingly (CTAs, status marks, one
-    highlight per section at most), never as a base color. */
-    --color-stamp-500: #b8462f;
-    --color-stamp-600: #9c3a26;
+    /* Coral — energetic orange for strong CTAs */
+    --color-coral-500: #ff6d00;
+    --color-coral-600: #e65100;
 
-    /* Brass/hardware accent — even more sparing than stamp, for small
-    marks like certification badges or a single highlighted stat. */
-    --color-brass-500: #b3872f;
+    /* Mint — fresh green for accents and badges */
+    --color-mint-400: #69f0ae;
+    --color-mint-500: #00e676;
+    --color-mint-600: #00c853;
+
+    /* Slate neutrals */
+    --color-slate-50:  #f8fafc;
+    --color-slate-100: #f1f5f9;
+    --color-slate-200: #e2e8f0;
+    --color-slate-300: #cbd5e1;
+    --color-slate-400: #94a3b8;
+    --color-slate-500: #64748b;
+    --color-slate-600: #475569;
+    --color-slate-700: #334155;
+    --color-slate-800: #1e293b;
+    --color-slate-900: #0f172a;
 }
 
 @layer theme {
@@ -81,7 +81,6 @@
 }
 
 @layer base {
-
     *,
     ::after,
     ::before,
@@ -105,57 +104,47 @@ select:focus[data-flux-control] {
     @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
 }
 
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */
-
-@keyframes bubble-float {
-    0%, 100% {
-        transform: translateY(0) translateX(0);
-    }
-    50% {
-        transform: translateY(-18px) translateX(6px);
-    }
+/* Scroll-reveal via IntersectionObserver */
+.reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.animate-bubble-float {
-    animation: bubble-float 6s ease-in-out infinite;
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-@keyframes blob-float {
-    0%, 100% {
-        transform: translate(0, 0) scale(1);
-    }
-    33% {
-        transform: translate(3%, -4%) scale(1.05);
-    }
-    66% {
-        transform: translate(-3%, 3%) scale(0.97);
-    }
-}
+/* Stagger children reveals */
+.reveal-stagger > .reveal:nth-child(2) { transition-delay: 0.08s; }
+.reveal-stagger > .reveal:nth-child(3) { transition-delay: 0.16s; }
+.reveal-stagger > .reveal:nth-child(4) { transition-delay: 0.24s; }
 
-.animate-blob-float {
-    animation: blob-float 14s ease-in-out infinite;
-}
-
-/* Subtle dot-grid texture. Colour it with a text-* utility (uses
-currentColor) and control intensity with a text color opacity modifier,
-e.g. text-white/10 or text-brand-900/5. */
-.bg-dot-grid {
-    background-image: radial-gradient(currentColor 1.5px, transparent 1.5px);
-    background-size: 24px 24px;
-}
-
-/* Editorial oversized heading — used sparingly for section titles that
-need more visual weight than a plain text-3xl/4xl. */
+/* Display heading tracking */
 .heading-display {
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     line-height: 1.05;
 }
 
-/* Dashed shipping-route connector — colour with a text-* utility (uses
-currentColor), for the "Manifest" concept's distribution-route diagram. */
-.route-line {
-    background-image: repeating-linear-gradient(to right, currentColor 0, currentColor 5px, transparent 5px, transparent 12px);
-    height: 2px;
+/* Image overlay gradient for hero sections */
+.overlay-left {
+    background: linear-gradient(to right, rgba(10, 31, 77, 0.85) 0%, rgba(10, 31, 77, 0.6) 45%, transparent 100%);
+}
+
+.overlay-bottom {
+    background: linear-gradient(to top, rgba(10, 31, 77, 0.8) 0%, rgba(10, 31, 77, 0.3) 50%, transparent 100%);
+}
+
+/* Gradient backgrounds for sections */
+.bg-gradient-brand {
+    background: linear-gradient(135deg, #2962ff 0%, #1a47cc 100%);
+}
+
+.bg-gradient-sun {
+    background: linear-gradient(135deg, #ffab00 0%, #ff8f00 50%, #ff6d00 100%);
+}
+
+.bg-gradient-sky {
+    background: linear-gradient(180deg, #e8f4ff 0%, #ffffff 100%);
 }

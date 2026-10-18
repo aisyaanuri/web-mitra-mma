@@ -38,6 +38,27 @@ class ExportTest extends TestCase
         );
     }
 
+    public function test_admin_gudang_can_export_warehouse_orders_with_date_filters(): void
+    {
+        Order::factory()->create([
+            'warehouse_status' => WarehouseStatus::Diterima,
+            'order_placed_at' => '2026-09-10 10:00:00',
+        ]);
+        $user = User::factory()->role(UserRole::AdminGudang)->create();
+
+        $response = $this->actingAs($user)->get(route('admin.warehouse.export', [
+            'month' => '2026-09',
+            'date_from' => '2026-09-01',
+            'date_to' => '2026-09-30',
+        ]));
+
+        $response->assertOk();
+        $response->assertHeader(
+            'content-type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        );
+    }
+
     public function test_admin_gudang_cannot_export_reconciliation_report(): void
     {
         $user = User::factory()->role(UserRole::AdminGudang)->create();

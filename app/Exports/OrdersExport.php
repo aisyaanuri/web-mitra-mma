@@ -13,6 +13,9 @@ class OrdersExport implements FromQuery, WithHeadings, WithMapping
     public function __construct(
         private readonly ?string $status = null,
         private readonly ?string $search = null,
+        private readonly ?string $dateFrom = null,
+        private readonly ?string $dateTo = null,
+        private readonly ?string $month = null,
     ) {}
 
     public function query(): Builder
@@ -26,6 +29,15 @@ class OrdersExport implements FromQuery, WithHeadings, WithMapping
                         ->orWhereHas('shipments', fn ($sq) => $sq->where('tracking_number', 'like', "%{$search}%"));
                 });
             })
+            ->when($this->month, function ($q) {
+                $parts = explode('-', $this->month);
+                if (count($parts) === 2) {
+                    $q->whereYear('order_placed_at', $parts[0])
+                        ->whereMonth('order_placed_at', $parts[1]);
+                }
+            })
+            ->when($this->dateFrom, fn ($q) => $q->whereDate('order_placed_at', '>=', $this->dateFrom))
+            ->when($this->dateTo, fn ($q) => $q->whereDate('order_placed_at', '<=', $this->dateTo))
             ->with('shipments')
             ->orderByDesc('order_placed_at');
     }

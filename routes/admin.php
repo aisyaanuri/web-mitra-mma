@@ -24,7 +24,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
 
         Route::get('gudang/export', function (Request $request) {
             return Excel::download(
-                new OrdersExport($request->query('status'), $request->query('search')),
+                new OrdersExport(
+                    $request->query('status'),
+                    $request->query('search'),
+                    $request->query('date_from'),
+                    $request->query('date_to'),
+                    $request->query('month'),
+                ),
                 'pesanan-'.now()->format('Y-m-d').'.xlsx',
             );
         })->name('warehouse.export');

@@ -145,4 +145,71 @@ class WarehouseProcessingTest extends TestCase
             ->assertSee('ORDER-A')
             ->assertDontSee('ORDER-B');
     }
+
+    public function test_can_filter_by_month(): void
+    {
+        Order::factory()->create([
+            'shopee_order_sn' => 'ORDER-SEPTEMBER',
+            'order_placed_at' => '2026-09-15 10:00:00',
+        ]);
+        Order::factory()->create([
+            'shopee_order_sn' => 'ORDER-OCTOBER',
+            'order_placed_at' => '2026-10-05 14:00:00',
+        ]);
+        $user = User::factory()->role(UserRole::AdminGudang)->create();
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.warehouse.index')
+            ->set('month', '2026-09')
+            ->assertSee('ORDER-SEPTEMBER')
+            ->assertDontSee('ORDER-OCTOBER');
+    }
+
+    public function test_can_filter_by_date_range(): void
+    {
+        Order::factory()->create([
+            'shopee_order_sn' => 'ORDER-IN-RANGE',
+            'order_placed_at' => '2026-09-10 10:00:00',
+        ]);
+        Order::factory()->create([
+            'shopee_order_sn' => 'ORDER-BEFORE-RANGE',
+            'order_placed_at' => '2026-09-01 10:00:00',
+        ]);
+        Order::factory()->create([
+            'shopee_order_sn' => 'ORDER-AFTER-RANGE',
+            'order_placed_at' => '2026-09-25 10:00:00',
+        ]);
+        $user = User::factory()->role(UserRole::AdminGudang)->create();
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.warehouse.index')
+            ->set('dateFrom', '2026-09-08')
+            ->set('dateTo', '2026-09-15')
+            ->assertSee('ORDER-IN-RANGE')
+            ->assertDontSee('ORDER-BEFORE-RANGE')
+            ->assertDontSee('ORDER-AFTER-RANGE');
+    }
+
+    public function test_can_filter_by_today_and_reset_filters(): void
+    {
+        Order::factory()->create([
+            'shopee_order_sn' => 'ORDER-TODAY',
+            'order_placed_at' => now(),
+        ]);
+        Order::factory()->create([
+            'shopee_order_sn' => 'ORDER-LAST-MONTH',
+            'order_placed_at' => now()->subMonths(2),
+        ]);
+        $user = User::factory()->role(UserRole::AdminGudang)->create();
+
+        $component = Livewire::actingAs($user)
+            ->test('pages::admin.warehouse.index')
+            ->call('filterToday')
+            ->assertSee('ORDER-TODAY')
+            ->assertDontSee('ORDER-LAST-MONTH');
+
+        $component->call('resetFilters')
+            ->assertSee('ORDER-TODAY')
+            ->assertSee('ORDER-LAST-MONTH');
+    }
 }
