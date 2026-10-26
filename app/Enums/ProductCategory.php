@@ -11,7 +11,7 @@ enum ProductCategory: string
     {
         return match ($this) {
             self::YummyBites => 'Yummy Bites',
-            self::BerasImpor => 'Beras Impor',
+            self::BerasImpor => 'Beras Premium',
         };
     }
 }

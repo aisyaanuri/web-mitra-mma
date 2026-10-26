@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'order_id', 'shopee_return_sn', 'reason', 'status', 'refund_amount', 'raw_payload',
+    'physical_status', 'physical_note', 'verified_by', 'received_at',
 ])]
 class OrderReturn extends Model
 {
@@ -21,6 +22,7 @@ class OrderReturn extends Model
         return [
             'raw_payload' => 'array',
             'refund_amount' => 'decimal:2',
+            'received_at' => 'datetime',
         ];
     }
 
@@ -28,5 +30,11 @@ class OrderReturn extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    /** @return BelongsTo<User, $this> */
+    public function verifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'verified_by');
     }
 }

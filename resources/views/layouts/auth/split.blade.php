@@ -34,7 +34,7 @@
                                 Growing your Businesses without Worries
                             </h1>
                             <p class="mt-3 text-xs sm:text-sm leading-relaxed text-blue-100/90 font-normal">
-                                Solusi rantai pasok terpercaya untuk produk makanan bayi dan beras impor berkualitas tinggi. Efisien, aman, dan tepat waktu.
+                                Solusi rantai pasok terpercaya untuk produk makanan bayi dan beras premium berkualitas tinggi. Efisien, aman, dan tepat waktu.
                             </p>
                         </div>
 

@@ -23,7 +23,7 @@ new #[Layout('layouts::public')] class extends Component
     public function mount(): void
     {
         SEOMeta::setTitle('Kontak');
-        SEOMeta::setDescription('Hubungi PT Mustika Makmur Abadi untuk kerja sama distribusi Yummy Bites dan beras impor.');
+        SEOMeta::setDescription('Hubungi PT Mustika Makmur Abadi untuk kerja sama distribusi Yummy Bites dan beras premium.');
     }
 
     public function submit(): void

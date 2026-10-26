@@ -107,4 +107,113 @@ class ReconciliationReportTest extends TestCase
             ->assertSee('JAN-ORDER')
             ->assertDontSee('FEB-ORDER');
     }
+
+    public function test_can_search_by_order_sn_or_customer(): void
+    {
+        $orderA = Order::factory()->create([
+            'shopee_order_sn' => 'SEARCH-ABC-111',
+            'buyer_username' => 'ahmaddahlan',
+        ]);
+        ReconciliationRecord::factory()->create(['order_id' => $orderA->id]);
+
+        $orderB = Order::factory()->create([
+            'shopee_order_sn' => 'SEARCH-XYZ-222',
+            'buyer_username' => 'kurniawaneka',
+        ]);
+        ReconciliationRecord::factory()->create(['order_id' => $orderB->id]);
+
+        $owner = User::factory()->role(UserRole::Owner)->create();
+
+        Livewire::actingAs($owner)
+            ->test('pages::admin.reconciliation.index')
+            ->set('search', 'ahmad')
+            ->assertSee('SEARCH-ABC-111')
+            ->assertDontSee('SEARCH-XYZ-222');
+    }
+
+    public function test_can_open_investigation_modal_and_see_comparisons_and_items(): void
+    {
+        $order = Order::factory()->create([
+            'shopee_order_sn' => 'INVESTIGATE-001',
+            'marketplace_status' => 'COMPLETED',
+            'warehouse_status' => \App\Enums\WarehouseStatus::Diterima,
+            'buyer_username' => 'hjmardiah',
+            'total_amount' => 320000,
+        ]);
+        \App\Models\OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'item_name' => 'Yummy Bites Beberoll Blueberry 40g',
+            'sku' => 'YB-BBL-40G',
+            'quantity' => 4,
+            'unit_price' => 80000,
+            'subtotal' => 320000,
+        ]);
+
+        $record = ReconciliationRecord::factory()->create([
+            'order_id' => $order->id,
+            'match_status' => ReconciliationStatus::Selisih,
+        ]);
+
+        $owner = User::factory()->role(UserRole::Owner)->create();
+
+        Livewire::actingAs($owner)
+            ->test('pages::admin.reconciliation.index')
+            ->call('openInvestigation', $record->id)
+            ->assertSet('investigatingRecordId', $record->id)
+            ->assertSee('INVESTIGATE-001')
+            ->assertSee('hjmardiah')
+            ->assertSee('Yummy Bites Beberoll Blueberry 40g')
+            ->assertSee('YB-BBL-40G')
+            ->call('applyNoteTemplate', 'Pesanan telah terkirim via kurir marketplace tetapi admin gudang terlambat update sistem.')
+            ->assertSet('noteText', 'Pesanan telah terkirim via kurir marketplace tetapi admin gudang terlambat update sistem.')
+            ->call('closeInvestigation')
+            ->assertSet('investigatingRecordId', null);
+    }
+
+    public function test_can_resolve_warehouse_status_from_investigation(): void
+    {
+        $order = Order::factory()->create([
+            'shopee_order_sn' => 'RESOLVE-999',
+            'marketplace_status' => 'COMPLETED',
+            'warehouse_status' => \App\Enums\WarehouseStatus::Diterima,
+        ]);
+        $record = ReconciliationRecord::factory()->create([
+            'order_id' => $order->id,
+            'match_status' => ReconciliationStatus::Selisih,
+        ]);
+
+        $owner = User::factory()->role(UserRole::Owner)->create();
+
+        Livewire::actingAs($owner)
+            ->test('pages::admin.reconciliation.index')
+            ->call('openInvestigation', $record->id)
+            ->call('resolveWarehouseStatus', $record->id, 'dikirim');
+
+        $order->refresh();
+        $record->refresh();
+
+        $this->assertSame(\App\Enums\WarehouseStatus::Dikirim, $order->warehouse_status);
+        $this->assertSame(ReconciliationStatus::Sesuai, $record->match_status);
+        $this->assertDatabaseHas('warehouse_process_logs', [
+            'order_id' => $order->id,
+            'to_status' => 'dikirim',
+            'user_id' => $owner->id,
+        ]);
+    }
+
+    public function test_export_excel_with_search_parameter(): void
+    {
+        $owner = User::factory()->role(UserRole::Owner)->create();
+        $order = Order::factory()->create(['shopee_order_sn' => 'EXP-999-TEST']);
+        ReconciliationRecord::factory()->create(['order_id' => $order->id]);
+
+        $response = $this->actingAs($owner)
+            ->get(route('admin.reconciliation.export', ['search' => 'EXP-999']));
+
+        $response->assertOk();
+        $this->assertTrue(str_contains(
+            $response->headers->get('content-disposition', ''),
+            'attachment'
+        ));
+    }
 }

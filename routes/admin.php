@@ -42,9 +42,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
 
         Route::get('rekonsiliasi/export', function (Request $request) {
             return Excel::download(
-                new ReconciliationExport($request->query('period'), $request->query('matchStatus')),
+                new ReconciliationExport($request->query('period'), $request->query('matchStatus'), $request->query('search')),
                 'rekonsiliasi-'.now()->format('Y-m-d').'.xlsx',
             );
         })->name('reconciliation.export');
+    });
+
+    Route::middleware('role:owner,admin_marketplace,admin_gudang')->group(function () {
+        Route::livewire('retur', 'pages::admin.returns.index')->name('returns.index');
     });
 });

@@ -16,14 +16,23 @@ const observer = new IntersectionObserver(
     { threshold: 0.12 }
 );
 
+const observeReveals = () => {
+    document.querySelectorAll('.reveal:not(.is-visible)').forEach((el) => {
+        observer.observe(el);
+    });
+};
+
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
-/* Re-observe after Livewire navigations (wire:navigate) so new page
-content picks up the reveal class without a full page reload. */
-document.addEventListener('livewire:navigated', () => {
-    document.querySelectorAll('.reveal:not(.is-visible)').forEach((el) =>
-        observer.observe(el)
-    );
+/* Re-observe after Livewire navigations (wire:navigate) and dynamic component morphs */
+document.addEventListener('livewire:navigated', observeReveals);
+
+document.addEventListener('livewire:init', () => {
+    if (window.Livewire) {
+        window.Livewire.hook('commit', () => {
+            requestAnimationFrame(observeReveals);
+        });
+    }
 });
 
 window.Swiper = Swiper;

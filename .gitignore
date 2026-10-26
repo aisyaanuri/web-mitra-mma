@@ -4,6 +4,8 @@
 # from here into storage/app/public/products (which IS committed); this
 # folder itself is a messy source drop, not app code.
 /ALL PRODUK
+/FOTO PRODUK BERAS
+/Gambar lokasi
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot

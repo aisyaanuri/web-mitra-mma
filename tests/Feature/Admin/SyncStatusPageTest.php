@@ -52,4 +52,69 @@ class SyncStatusPageTest extends TestCase
             ->get(route('admin.sync.index'))
             ->assertSee('Fake (Data Simulasi)');
     }
+
+    public function test_can_open_and_close_log_detail_modal(): void
+    {
+        $owner = User::factory()->role(UserRole::Owner)->create();
+        $log = SyncLog::create([
+            'job_type' => 'shopee_orders',
+            'status' => 'success',
+            'message' => '2 pesanan berhasil disinkronkan.',
+            'payload' => [
+                'synced_count' => 2,
+                'orders' => [
+                    [
+                        'order_sn' => 'SP-TEST-999',
+                        'buyer' => 'Ibu Siti Khadijah',
+                        'amount' => 175000,
+                        'status' => 'READY_TO_SHIP',
+                        'items_count' => 3,
+                    ],
+                ],
+            ],
+            'created_at' => now(),
+        ]);
+
+        Livewire::actingAs($owner)
+            ->test('pages::admin.sync.index')
+            ->call('openLogDetail', $log->id)
+            ->assertSet('selectedLogId', $log->id)
+            ->assertSee('SP-TEST-999')
+            ->assertSee('Ibu Siti Khadijah')
+            ->call('closeLogDetail')
+            ->assertSet('selectedLogId', null);
+    }
+
+    public function test_can_switch_tabs_and_view_order_details(): void
+    {
+        $owner = User::factory()->role(UserRole::Owner)->create();
+        $order = \App\Models\Order::factory()->create([
+            'shopee_order_sn' => 'SP-SYNC-VIEW-01',
+            'buyer_username' => 'budisantoso99',
+            'total_amount' => 250000,
+            'marketplace_status' => 'PROCESSED',
+            'warehouse_status' => \App\Enums\WarehouseStatus::Dikemas,
+        ]);
+
+        \App\Models\OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'item_name' => 'Beras Pandan Wangi Super 5kg',
+            'sku' => 'BPW-5KG',
+            'quantity' => 2,
+            'unit_price' => 125000,
+            'subtotal' => 250000,
+        ]);
+
+        Livewire::actingAs($owner)
+            ->test('pages::admin.sync.index')
+            ->set('activeTab', 'orders')
+            ->assertSee('SP-SYNC-VIEW-01')
+            ->assertSee('budisantoso99')
+            ->call('viewOrder', $order->id)
+            ->assertSet('viewingOrderId', $order->id)
+            ->assertSee('Beras Pandan Wangi Super 5kg')
+            ->assertSee('BPW-5KG')
+            ->call('closeOrderView')
+            ->assertSet('viewingOrderId', null);
+    }
 }

@@ -13,6 +13,7 @@ class ReconciliationExport implements FromQuery, WithHeadings, WithMapping
     public function __construct(
         private readonly ?string $period = null,
         private readonly ?string $matchStatus = null,
+        private readonly ?string $search = null,
     ) {}
 
     public function query(): Builder
@@ -23,6 +24,12 @@ class ReconciliationExport implements FromQuery, WithHeadings, WithMapping
                     ->whereMonth('period', substr($this->period, 5, 2));
             })
             ->when($this->matchStatus, fn ($q) => $q->where('match_status', $this->matchStatus))
+            ->when($this->search, function ($q) {
+                $q->whereHas('order', function ($sub) {
+                    $sub->where('shopee_order_sn', 'like', '%' . $this->search . '%')
+                        ->orWhere('buyer_username', 'like', '%' . $this->search . '%');
+                });
+            })
             ->with('order')
             ->orderByDesc('period');
     }

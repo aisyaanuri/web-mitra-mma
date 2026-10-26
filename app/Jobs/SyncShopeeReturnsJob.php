@@ -32,9 +32,17 @@ class SyncShopeeReturnsJob implements ShouldQueue
             $returns = $gateway->getReturnList(now()->subDays(7), now());
 
             $synced = 0;
+            $returnsList = [];
             foreach ($returns as $returnData) {
                 if ($this->syncReturn($returnData)) {
                     $synced++;
+                    $returnsList[] = [
+                        'return_sn' => $returnData['return_sn'],
+                        'order_sn' => $returnData['order_sn'],
+                        'reason' => $returnData['reason'] ?? 'Tidak disebutkan',
+                        'status' => $returnData['status'],
+                        'refund_amount' => (float) $returnData['refund_amount'],
+                    ];
                 }
             }
 
@@ -42,13 +50,19 @@ class SyncShopeeReturnsJob implements ShouldQueue
                 'job_type' => 'shopee_returns',
                 'status' => SyncStatus::Success,
                 'message' => __(':count retur disinkronkan.', ['count' => $synced]),
-                'payload' => ['synced' => $synced],
+                'payload' => [
+                    'synced' => $synced,
+                    'returns' => $returnsList,
+                ],
             ]);
         } catch (Throwable $e) {
             SyncLog::create([
                 'job_type' => 'shopee_returns',
                 'status' => SyncStatus::Failed,
                 'message' => $e->getMessage(),
+                'payload' => [
+                    'error' => $e->getMessage(),
+                ],
             ]);
 
             throw $e;

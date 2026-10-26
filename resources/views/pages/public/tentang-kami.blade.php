@@ -13,7 +13,7 @@ new #[Layout('layouts::public')] class extends Component
     public function mount(): void
     {
         SEOMeta::setTitle('Tentang Kami');
-        SEOMeta::setDescription('Profil PT Mustika Makmur Abadi, distributor resmi Yummy Bites dan beras impor sejak 2019.');
+        SEOMeta::setDescription('Profil PT Mustika Makmur Abadi, distributor resmi Yummy Bites dan beras premium sejak 2019.');
         OpenGraph::setTitle('Tentang Kami - PT Mustika Makmur Abadi');
     }
 
@@ -62,7 +62,7 @@ new #[Layout('layouts::public')] class extends Component
             [
                 'year' => SiteSetting::get('established_year', '2019'),
                 'title' => 'Berdiri',
-                'desc' => 'Memulai usaha sebagai distributor resmi Yummy Bites dan beras impor di Sidoarjo, Jawa Timur.',
+                'desc' => 'Memulai usaha sebagai distributor resmi Yummy Bites dan beras premium di Sidoarjo, Jawa Timur.',
             ],
             [
                 'year' => 'Kini',
@@ -77,7 +77,7 @@ new #[Layout('layouts::public')] class extends Component
     public function differentiators(): array
     {
         return [
-            ['title' => 'Distributor Resmi', 'desc' => 'Mitra resmi Yummy Bites & beras impor dari berbagai negara, bukan reseller.'],
+            ['title' => 'Distributor Resmi', 'desc' => 'Mitra resmi Yummy Bites & beras premium (impor & lokal) dari berbagai sumber terpercaya, bukan reseller.'],
             ['title' => 'Armada Sendiri', 'desc' => 'Gratis ongkir untuk area Surabaya Raya tanpa bergantung ekspedisi pihak ketiga.'],
             ['title' => '355+ Outlet', 'desc' => 'Jaringan distribusi aktif di 8 wilayah Indonesia bagian timur.'],
             ['title' => 'Berpengalaman', 'desc' => 'Melayani mitra bisnis sejak 2019 dengan 18 tenaga ahli distribusi.'],

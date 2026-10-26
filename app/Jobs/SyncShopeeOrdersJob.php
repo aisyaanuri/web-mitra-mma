@@ -34,29 +34,44 @@ class SyncShopeeOrdersJob implements ShouldQueue
             $summaries = $gateway->getOrderList(now()->subDay(), now());
 
             $synced = 0;
+            $syncedOrders = [];
             foreach ($summaries as $summary) {
-                $this->syncOrder($gateway, $summary['order_sn']);
+                $order = $this->syncOrder($gateway, $summary['order_sn']);
                 $synced++;
+                $syncedOrders[] = [
+                    'order_sn' => $order->shopee_order_sn,
+                    'buyer' => $order->buyer_username ?? 'Anonim',
+                    'amount' => (float) $order->total_amount,
+                    'currency' => $order->currency ?? 'IDR',
+                    'status' => $order->marketplace_status,
+                    'items_count' => $order->items()->count(),
+                ];
             }
 
             SyncLog::create([
                 'job_type' => 'shopee_orders',
                 'status' => SyncStatus::Success,
                 'message' => __(':count pesanan berhasil disinkronkan.', ['count' => $synced]),
-                'payload' => ['synced' => $synced],
+                'payload' => [
+                    'synced' => $synced,
+                    'orders' => $syncedOrders,
+                ],
             ]);
         } catch (Throwable $e) {
             SyncLog::create([
                 'job_type' => 'shopee_orders',
                 'status' => SyncStatus::Failed,
                 'message' => $e->getMessage(),
+                'payload' => [
+                    'error' => $e->getMessage(),
+                ],
             ]);
 
             throw $e;
         }
     }
 
-    private function syncOrder(ShopeeGatewayInterface $gateway, string $orderSn): void
+    private function syncOrder(ShopeeGatewayInterface $gateway, string $orderSn): Order
     {
         $detail = $gateway->getOrderDetail($orderSn);
 
@@ -87,6 +102,8 @@ class SyncShopeeOrdersJob implements ShouldQueue
         foreach ($detail['item_list'] as $item) {
             $this->syncItem($order, $item);
         }
+
+        return $order;
     }
 
     /**

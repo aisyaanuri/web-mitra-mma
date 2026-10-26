@@ -34,29 +34,42 @@ class SyncShopeeLogisticsJob implements ShouldQueue
                 ->get();
 
             $synced = 0;
+            $trackingList = [];
             foreach ($orders as $order) {
-                $this->syncTracking($gateway, $order);
+                $shipment = $this->syncTracking($gateway, $order);
                 $synced++;
+                $trackingList[] = [
+                    'order_sn' => $order->shopee_order_sn,
+                    'tracking_number' => $shipment->tracking_number ?? 'Belum terbit',
+                    'carrier' => $shipment->carrier ?? 'Kurir Shopee',
+                    'logistics_status' => $shipment->shopee_logistics_status,
+                ];
             }
 
             SyncLog::create([
                 'job_type' => 'shopee_logistics',
                 'status' => SyncStatus::Success,
                 'message' => __('Status pengiriman :count pesanan diperbarui.', ['count' => $synced]),
-                'payload' => ['synced' => $synced],
+                'payload' => [
+                    'synced' => $synced,
+                    'tracking' => $trackingList,
+                ],
             ]);
         } catch (Throwable $e) {
             SyncLog::create([
                 'job_type' => 'shopee_logistics',
                 'status' => SyncStatus::Failed,
                 'message' => $e->getMessage(),
+                'payload' => [
+                    'error' => $e->getMessage(),
+                ],
             ]);
 
             throw $e;
         }
     }
 
-    private function syncTracking(ShopeeGatewayInterface $gateway, Order $order): void
+    private function syncTracking(ShopeeGatewayInterface $gateway, Order $order): Shipment
     {
         $tracking = $gateway->getTrackingInfo($order->shopee_order_sn);
 
@@ -66,7 +79,7 @@ class SyncShopeeLogisticsJob implements ShouldQueue
             'shipping_carrier' => ['nullable', 'string'],
         ])->validate();
 
-        Shipment::updateOrCreate(
+        return Shipment::updateOrCreate(
             ['order_id' => $order->id],
             [
                 'tracking_number' => $validated['tracking_number'] ?? null,

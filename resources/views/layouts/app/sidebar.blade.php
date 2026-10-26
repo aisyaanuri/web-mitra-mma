@@ -42,6 +42,10 @@
                         </flux:sidebar.item>
                     @endif
 
+                    <flux:sidebar.item icon="arrow-path" :href="route('admin.returns.index')" :current="request()->routeIs('admin.returns.*')" wire:navigate>
+                        {{ __('Retur') }}
+                    </flux:sidebar.item>
+
                     @if (auth()->user()->isOwner())
                         <flux:sidebar.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
                             {{ __('Pengguna') }}

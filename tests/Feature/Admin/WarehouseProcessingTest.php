@@ -212,4 +212,79 @@ class WarehouseProcessingTest extends TestCase
             ->assertSee('ORDER-TODAY')
             ->assertSee('ORDER-LAST-MONTH');
     }
+
+    public function test_admin_gudang_can_bulk_update_orders_status(): void
+    {
+        $order1 = Order::factory()->create([
+            'marketplace_status' => 'READY_TO_SHIP',
+            'warehouse_status' => WarehouseStatus::Diterima,
+        ]);
+        $order2 = Order::factory()->create([
+            'marketplace_status' => 'READY_TO_SHIP',
+            'warehouse_status' => WarehouseStatus::Diterima,
+        ]);
+        $user = User::factory()->role(UserRole::AdminGudang)->create();
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.warehouse.index')
+            ->set('selectedOrderIds', [(string) $order1->id, (string) $order2->id])
+            ->call('bulkUpdateStatus', 'dikemas');
+
+        $order1->refresh();
+        $order2->refresh();
+
+        $this->assertSame(WarehouseStatus::Dikemas, $order1->warehouse_status);
+        $this->assertSame(WarehouseStatus::Dikemas, $order2->warehouse_status);
+        $this->assertSame(2, WarehouseProcessLog::where('to_status', 'dikemas')->where('user_id', $user->id)->count());
+    }
+
+    public function test_cancelled_orders_cannot_be_advanced_or_bulk_updated(): void
+    {
+        $cancelledOrder = Order::factory()->create([
+            'marketplace_status' => 'CANCELLED',
+            'warehouse_status' => WarehouseStatus::Diterima,
+        ]);
+        $user = User::factory()->role(UserRole::AdminGudang)->create();
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.warehouse.index')
+            ->call('advance', $cancelledOrder->id)
+            ->assertForbidden();
+
+        $cancelledOrder->refresh();
+        $this->assertSame(WarehouseStatus::Diterima, $cancelledOrder->warehouse_status);
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.warehouse.index')
+            ->set('selectedOrderIds', [(string) $cancelledOrder->id])
+            ->call('bulkUpdateStatus', 'dikemas');
+
+        $cancelledOrder->refresh();
+        $this->assertSame(WarehouseStatus::Diterima, $cancelledOrder->warehouse_status);
+    }
+
+    public function test_can_open_and_close_packing_slip(): void
+    {
+        $order = Order::factory()->create([
+            'shopee_order_sn' => 'SN-SLIP-TEST',
+            'buyer_username' => 'ibu_rahmawati',
+        ]);
+        \App\Models\OrderItem::factory()->create([
+            'order_id' => $order->id,
+            'item_name' => 'Beras Koshikari 5kg',
+            'sku' => 'BS-KOSHI-5KG',
+            'quantity' => 1,
+        ]);
+        $user = User::factory()->role(UserRole::AdminGudang)->create();
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.warehouse.index')
+            ->call('openPackingSlip', $order->id)
+            ->assertSet('packingSlipOrderId', $order->id)
+            ->assertSee('SN-SLIP-TEST')
+            ->assertSee('Beras Koshikari 5kg')
+            ->assertSee('BS-KOSHI-5KG')
+            ->call('closePackingSlip')
+            ->assertSet('packingSlipOrderId', null);
+    }
 }

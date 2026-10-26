@@ -139,7 +139,7 @@
                             <p class="font-display text-lg font-bold">PT Mustika Makmur Abadi</p>
                         </div>
                         <p class="mt-4 max-w-sm text-sm leading-relaxed text-brand-200">
-                            Distributor resmi Yummy Bites dan beras impor, berdiri sejak {{ \App\Models\SiteSetting::get('established_year', '2019') }}.
+                            Distributor resmi Yummy Bites dan beras premium, berdiri sejak {{ \App\Models\SiteSetting::get('established_year', '2019') }}.
                         </p>
                         <p class="mt-4 text-sm leading-relaxed text-brand-200">
                             {{ \App\Models\SiteSetting::get('office_address') }}
