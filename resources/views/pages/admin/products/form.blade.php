@@ -67,13 +67,51 @@ new #[Title('Form Produk')] class extends Component
         }
     }
 
+    public function updatedNewImages(): void
+    {
+        $this->validate(
+            $this->imageValidationRules(),
+            $this->imageValidationMessages()
+        );
+    }
+
+    public function removeNewImage(int $index): void
+    {
+        unset($this->newImages[$index]);
+        $this->newImages = array_values($this->newImages);
+    }
+
+    /**
+     * @return array<string, array<int, mixed>>
+     */
+    protected function imageValidationRules(): array
+    {
+        return [
+            'newImages' => ['nullable', 'array', 'max:5'],
+            'newImages.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function imageValidationMessages(): array
+    {
+        return [
+            'newImages.max' => __('Maksimal 5 foto yang dapat diunggah sekaligus.'),
+            'newImages.*.image' => __('File yang diunggah harus berupa file gambar yang valid.'),
+            'newImages.*.mimes' => __('Format file tidak diizinkan. Hanya format JPG, JPEG, PNG, GIF, dan WEBP yang diperbolehkan.'),
+            'newImages.*.max' => __('Ukuran gambar terlalu besar. Maksimal ukuran per file adalah 2 MB (2048 KB).'),
+        ];
+    }
+
     public function save(): void
     {
         if ($this->category !== ProductCategory::BerasImpor->value) {
             $this->country_of_origin = null;
         }
 
-        $validated = $this->validate([
+        $validated = $this->validate(array_merge([
             'name' => ['required', 'string', 'max:255'],
             'slug' => ['required', 'string', 'max:255', Rule::unique('products', 'slug')->ignore($this->product?->id)],
             'sku' => ['required', 'string', 'max:100', Rule::unique('products', 'sku')->ignore($this->product?->id)],
@@ -85,8 +123,7 @@ new #[Title('Form Produk')] class extends Component
             'is_featured' => ['boolean'],
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:255'],
-            'newImages.*' => ['nullable', 'image', 'max:6144'],
-        ]);
+        ], $this->imageValidationRules()), $this->imageValidationMessages());
 
         $product = $this->product ?? new Product;
         $product->fill(collect($validated)->except('newImages')->toArray());
@@ -168,16 +205,63 @@ new #[Title('Form Produk')] class extends Component
                 </div>
             @endif
 
-            <input type="file" wire:model="newImages" multiple accept="image/*" class="mt-3 block text-sm" />
-            @error('newImages.*') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            <input 
+                type="file" 
+                wire:model="newImages" 
+                multiple 
+                accept=".jpg,.jpeg,.png,.gif,.webp,image/jpeg,image/png,image/gif,image/webp" 
+                class="mt-3 block w-full text-sm text-zinc-600 file:mr-4 file:rounded-md file:border-0 file:bg-zinc-100 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-zinc-700 hover:file:bg-zinc-200 dark:text-zinc-300 dark:file:bg-zinc-800 dark:file:text-zinc-200" 
+            />
+            <p class="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                {{ __('Format: JPG, JPEG, PNG, GIF, WEBP. Maks. 2 MB per file (maks. 5 foto sekaligus).') }}
+            </p>
 
-            <div wire:loading wire:target="newImages" class="mt-2 text-sm text-zinc-500">{{ __('Mengunggah...') }}</div>
+            @error('newImages')
+                <div class="mt-2 flex items-center gap-2 rounded-md bg-red-50 p-2.5 text-xs text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200 dark:border-red-900/50">
+                    <svg class="h-4 w-4 shrink-0 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>{{ $message }}</span>
+                </div>
+            @enderror
+
+            @error('newImages.*')
+                <div class="mt-2 flex items-center gap-2 rounded-md bg-red-50 p-2.5 text-xs text-red-700 dark:bg-red-950/40 dark:text-red-400 border border-red-200 dark:border-red-900/50">
+                    <svg class="h-4 w-4 shrink-0 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span>{{ $message }}</span>
+                </div>
+            @enderror
+
+            <div wire:loading wire:target="newImages" class="mt-2 flex items-center gap-2 text-xs text-zinc-500">
+                <svg class="h-4 w-4 animate-spin text-zinc-500" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span>{{ __('Sedang mengunggah dan memverifikasi gambar...') }}</span>
+            </div>
 
             @if (! empty($newImages))
-                <div class="mt-3 grid grid-cols-4 gap-3">
-                    @foreach ($newImages as $file)
-                        <img src="{{ $file->temporaryUrl() }}" class="aspect-square w-full rounded-lg object-cover">
-                    @endforeach
+                <div class="mt-3">
+                    <p class="text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1.5">{{ __('Pratinjau Foto Baru:') }}</p>
+                    <div class="grid grid-cols-4 gap-3">
+                        @foreach ($newImages as $index => $file)
+                            @if (method_exists($file, 'isPreviewable') && $file->isPreviewable())
+                                <div class="relative group" wire:key="new-image-preview-{{ $index }}">
+                                    <img src="{{ $file->temporaryUrl() }}" class="aspect-square w-full rounded-lg object-cover border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                                    <button
+                                        type="button"
+                                        wire:click="removeNewImage({{ $index }})"
+                                        class="absolute -top-2 -right-2 rounded-full bg-zinc-800 hover:bg-black px-2 py-0.5 text-xs text-white shadow"
+                                        title="{{ __('Batal unggah') }}"
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
                 </div>
             @endif
         </div>

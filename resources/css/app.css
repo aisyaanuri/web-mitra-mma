@@ -32,27 +32,28 @@
     --color-accent-content: var(--color-brand-600);
     --color-accent-foreground: var(--color-white);
 
-    /* Brand blue — upgraded to more vivid "electric" blue */
-    --color-brand-50:  #e8f4ff;
-    --color-brand-100: #d0e8ff;
-    --color-brand-200: #a3d4ff;
-    --color-brand-300: #5cb5ff;
-    --color-brand-400: #2196ff;
-    --color-brand-500: #2979ff;
-    --color-brand-600: #2962ff;
-    --color-brand-700: #1a47cc;
-    --color-brand-800: #0d3199;
-    --color-brand-900: #0a1f4d;
+    /* Brand blue — corporate royal navy & sapphire (refined B2B standard) */
+    --color-brand-50:  #f0f7ff;
+    --color-brand-100: #e0effe;
+    --color-brand-200: #bae0fd;
+    --color-brand-300: #7cc5fb;
+    --color-brand-400: #38a5f8;
+    --color-brand-500: #0e87e7;
+    --color-brand-600: #1d4ed8;
+    --color-brand-700: #1e40af;
+    --color-brand-800: #1e3a8a;
+    --color-brand-900: #0f254e;
+    --color-brand-950: #0a1733;
 
-    /* Sun accent — warmer, more amber-gold (appetite-triggering) */
-    --color-sun-300: #ffd54f;
-    --color-sun-400: #ffca28;
-    --color-sun-500: #ffab00;
-    --color-sun-600: #ff8f00;
+    /* Sun accent — warm honey-gold (natural, food-grade feel) */
+    --color-sun-300: #fde68a;
+    --color-sun-400: #fcd34d;
+    --color-sun-500: #f59e0b;
+    --color-sun-600: #d97706;
 
-    /* Coral — energetic orange for strong CTAs */
-    --color-coral-500: #ff6d00;
-    --color-coral-600: #e65100;
+    /* Coral — warm amber orange */
+    --color-coral-500: #f97316;
+    --color-coral-600: #ea580c;
 
     /* Mint — fresh green for accents and badges */
     --color-mint-400: #69f0ae;
@@ -138,13 +139,13 @@ select:focus[data-flux-control] {
 
 /* Gradient backgrounds for sections */
 .bg-gradient-brand {
-    background: linear-gradient(135deg, #2962ff 0%, #1a47cc 100%);
+    background: linear-gradient(135deg, #1d4ed8 0%, #0f254e 100%);
 }
 
 .bg-gradient-sun {
-    background: linear-gradient(135deg, #ffab00 0%, #ff8f00 50%, #ff6d00 100%);
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #ea580c 100%);
 }
 
 .bg-gradient-sky {
-    background: linear-gradient(180deg, #e8f4ff 0%, #ffffff 100%);
+    background: linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%);
 }

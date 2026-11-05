@@ -128,4 +128,62 @@ class ProductCrudTest extends TestCase
 
         $this->assertFalse($product->fresh()->is_active);
     }
+
+    public function test_upload_txt_file_is_rejected_by_server_validation(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->role(UserRole::AdminMarketplace)->create();
+        $fakeTxt = UploadedFile::fake()->create('dokumen_rahasia.txt', 50, 'text/plain');
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.products.form')
+            ->set('name', 'Produk Tes TXT')
+            ->set('sku', 'TEST-TXT-001')
+            ->set('category', ProductCategory::YummyBites->value)
+            ->set('newImages', [$fakeTxt])
+            ->assertHasErrors(['newImages.0'])
+            ->call('save')
+            ->assertHasErrors(['newImages.0']);
+    }
+
+    public function test_upload_file_exceeding_2mb_is_rejected_by_server_validation(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->role(UserRole::AdminMarketplace)->create();
+        // 3000 KB > 2048 KB (2 MB)
+        $largeImage = UploadedFile::fake()->create('foto_raksasa.jpg', 3000, 'image/jpeg');
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.products.form')
+            ->set('name', 'Produk Tes Ukuran Besar')
+            ->set('sku', 'TEST-SIZE-001')
+            ->set('category', ProductCategory::YummyBites->value)
+            ->set('newImages', [$largeImage])
+            ->assertHasErrors(['newImages.0'])
+            ->call('save')
+            ->assertHasErrors(['newImages.0']);
+    }
+
+    public function test_upload_accepts_jpeg_png_and_gif_formats(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->role(UserRole::AdminMarketplace)->create();
+
+        $jpgImage = UploadedFile::fake()->image('foto1.jpeg');
+        $pngImage = UploadedFile::fake()->image('foto2.png');
+        $gifImage = UploadedFile::fake()->image('foto3.gif');
+
+        Livewire::actingAs($user)
+            ->test('pages::admin.products.form')
+            ->set('name', 'Produk Multi Format')
+            ->set('sku', 'TEST-MULTI-FORMAT')
+            ->set('category', ProductCategory::YummyBites->value)
+            ->set('newImages', [$jpgImage, $pngImage, $gifImage])
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $product = Product::where('sku', 'TEST-MULTI-FORMAT')->first();
+        $this->assertNotNull($product);
+        $this->assertCount(3, $product->images);
+    }
 }

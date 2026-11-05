@@ -39,6 +39,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified'])->group(
     Route::middleware('role:owner,admin_marketplace')->group(function () {
         Route::livewire('rekonsiliasi', 'pages::admin.reconciliation.index')->name('reconciliation.index');
         Route::livewire('sinkronisasi', 'pages::admin.sync.index')->name('sync.index');
+        Route::livewire('pesan', 'pages::admin.messages.index')->name('messages.index');
 
         Route::get('rekonsiliasi/export', function (Request $request) {
             return Excel::download(

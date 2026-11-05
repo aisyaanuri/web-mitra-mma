@@ -40,7 +40,7 @@
                 {{-- Official Logo: image + text --}}
                 <a href="{{ route('home') }}" wire:navigate class="flex items-center gap-2.5">
                     <img
-                        src="{{ asset('images/logo-mustika-square.png') }}"
+                        src="{{ asset('images/logo-mustika-square.webp') }}"
                         alt="Logo PT Mustika Makmur Abadi"
                         class="h-9 w-9 rounded-lg object-contain bg-white shadow-xs border border-slate-100 dark:border-zinc-700 p-0.5"
                     >
@@ -132,7 +132,7 @@
                     <div>
                         <div class="flex items-center gap-2.5">
                             <img
-                                src="{{ asset('images/logo-mustika-square.png') }}"
+                                src="{{ asset('images/logo-mustika-square.webp') }}"
                                 alt="Logo PT Mustika Makmur Abadi"
                                 class="h-9 w-9 rounded-lg object-contain bg-white shadow-xs p-0.5"
                             >

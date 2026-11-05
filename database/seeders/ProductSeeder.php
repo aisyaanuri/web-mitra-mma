@@ -366,9 +366,14 @@ class ProductSeeder extends Seeder
                 continue;
             }
 
-            $extension = File::extension($sourcePath);
-            $storedPath = $targetDir.'/'.$item['slug'].'.'.$extension;
-            File::copy($sourcePath, storage_path('app/public/'.$storedPath));
+            $webpPath = $targetDir.'/'.$item['slug'].'.webp';
+            if (File::exists(storage_path('app/public/'.$webpPath))) {
+                $storedPath = $webpPath;
+            } else {
+                $extension = File::extension($sourcePath);
+                $storedPath = $targetDir.'/'.$item['slug'].'.'.$extension;
+                File::copy($sourcePath, storage_path('app/public/'.$storedPath));
+            }
 
             ProductImage::updateOrCreate(
                 ['product_id' => $product->id, 'sort_order' => 0],
@@ -399,9 +404,14 @@ class ProductSeeder extends Seeder
                 continue;
             }
 
-            $extension = File::extension($sourcePath);
-            $storedPath = $targetDir.'/'.$item['slug'].'.'.$extension;
-            File::copy($sourcePath, storage_path('app/public/'.$storedPath));
+            $webpPath = $targetDir.'/'.$item['slug'].'.webp';
+            if (File::exists(storage_path('app/public/'.$webpPath))) {
+                $storedPath = $webpPath;
+            } else {
+                $extension = File::extension($sourcePath);
+                $storedPath = $targetDir.'/'.$item['slug'].'.'.$extension;
+                File::copy($sourcePath, storage_path('app/public/'.$storedPath));
+            }
 
             ProductImage::updateOrCreate(
                 ['product_id' => $product->id, 'sort_order' => 0],

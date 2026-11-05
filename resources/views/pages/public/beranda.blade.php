@@ -65,7 +65,7 @@ new #[Layout('layouts::public')] class extends Component
          ============================================================ --}}
     <section class="relative min-h-[520px] overflow-hidden sm:min-h-[600px] lg:min-h-[680px]">
         <img
-            src="/images/illustrations/hero-distribusi.jpg?v={{ file_exists(public_path('images/illustrations/hero-distribusi.jpg')) ? filemtime(public_path('images/illustrations/hero-distribusi.jpg')) : '2' }}"
+            src="/images/illustrations/hero-distribusi.webp?v={{ file_exists(public_path('images/illustrations/hero-distribusi.webp')) ? filemtime(public_path('images/illustrations/hero-distribusi.webp')) : '2' }}"
             alt="Gedung operasional PT Mustika Makmur Abadi di Kawasan Industri SIRIE, Sidoarjo"
             class="absolute inset-0 h-full w-full object-cover object-right"
             fetchpriority="high"
@@ -112,28 +112,30 @@ new #[Layout('layouts::public')] class extends Component
 
     {{-- ============================================================
          SECTION 2: YUMMY BITES — Split 50/50, illustration left
-         Background oranye-kuning di kanan. Tidak ada border/kotak.
+         Background oranye-kuning di kanan.
          ============================================================ --}}
     <section class="overflow-hidden">
         <div class="grid lg:grid-cols-2">
             <div class="relative min-h-[360px] lg:min-h-[480px]">
                 <img
-                    src="/images/illustrations/yummy-bites.jpg"
+                    src="/images/illustrations/yummy-bites.webp"
                     alt="Ilustrasi ibu dan bayi menikmati snack Yummy Bites"
                     class="absolute inset-0 h-full w-full object-cover"
                     loading="lazy"
                 >
             </div>
-            <div class="flex flex-col justify-center bg-gradient-to-br from-sun-500 to-coral-500 px-8 py-14 sm:px-12 lg:px-16 lg:py-20 reveal">
-                <span class="inline-block w-fit rounded-lg bg-white/20 px-3 py-1 text-xs font-bold text-white">MPASI & Snack Bayi</span>
+            <div class="flex flex-col justify-center bg-gradient-to-br from-amber-500 via-amber-600 to-orange-600 px-8 py-14 sm:px-12 lg:px-16 lg:py-20 reveal">
+                <span class="inline-block w-fit rounded-lg bg-white/20 px-3.5 py-1 text-xs font-bold tracking-wide text-white border border-white/20">MPASI & Snack Bayi</span>
                 <h2 class="heading-display font-display mt-4 text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">Yummy Bites</h2>
-                <p class="mt-4 max-w-md text-lg leading-relaxed text-white/90">
-                    Camilan MPASI untuk si kecil usia 6 bulan+ hingga 1 tahun+. {{ $this->yummyBitesCount }} produk aktif. Distributor resmi, bukan reseller.
+                <p class="mt-4 max-w-md text-base sm:text-lg leading-relaxed text-white/95">
+                    Camilan MPASI untuk si kecil usia 6 bulan+ hingga 1 tahun+. {{ $this->yummyBitesCount }} varian produk aktif. Distributor resmi langsung dari principal, bukan reseller.
                 </p>
-                <a href="{{ route('produk', ['category' => 'yummy_bites']) }}" wire:navigate class="mt-8 inline-flex w-fit items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-extrabold text-slate-900 shadow-lg transition hover:bg-slate-50 hover:shadow-xl">
-                    Lihat Produk Yummy Bites
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" /></svg>
-                </a>
+                <div class="mt-8">
+                    <a href="{{ route('produk', ['category' => 'yummy_bites']) }}" wire:navigate class="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-extrabold text-slate-900 shadow-lg shadow-black/10 transition hover:bg-amber-50 hover:shadow-xl focus:ring-2 focus:ring-white/50 focus:outline-none">
+                        Lihat Produk Yummy Bites
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" /></svg>
+                    </a>
+                </div>
             </div>
         </div>
     </section>
@@ -145,19 +147,21 @@ new #[Layout('layouts::public')] class extends Component
     <section class="overflow-hidden">
         <div class="grid lg:grid-cols-2">
             <div class="flex flex-col justify-center bg-gradient-brand px-8 py-14 sm:px-12 lg:order-first lg:px-16 lg:py-20 reveal">
-                <span class="inline-block w-fit rounded-lg bg-white/15 px-3 py-1 text-xs font-bold text-white">Beras Premium & Lokal</span>
+                <span class="inline-block w-fit rounded-lg bg-white/15 px-3.5 py-1 text-xs font-bold tracking-wide text-white border border-white/20">Beras Premium & Lokal</span>
                 <h2 class="heading-display font-display mt-4 text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">Beras Premium</h2>
-                <p class="mt-4 max-w-md text-lg leading-relaxed text-white/90">
+                <p class="mt-4 max-w-md text-base sm:text-lg leading-relaxed text-white/95">
                     Beras pilihan berkualitas: Beras Jepang, Basmati, Jasmin, Organik, Lokal, dan Lautan Mas. {{ $this->berasImporCount }} produk aktif, untuk kebutuhan rumah tangga, restoran, dan hotel.
                 </p>
-                <a href="{{ route('produk', ['category' => 'beras_impor']) }}" wire:navigate class="mt-8 inline-flex w-fit items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-extrabold text-brand-700 shadow-lg transition hover:bg-brand-50 hover:shadow-xl">
-                    Lihat Produk Beras
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" /></svg>
-                </a>
+                <div class="mt-8">
+                    <a href="{{ route('produk', ['category' => 'beras_impor']) }}" wire:navigate class="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-extrabold text-brand-900 shadow-lg shadow-black/10 transition hover:bg-slate-50 hover:shadow-xl focus:ring-2 focus:ring-white/50 focus:outline-none">
+                        Lihat Produk Beras
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" /></svg>
+                    </a>
+                </div>
             </div>
             <div class="relative min-h-[360px] lg:min-h-[480px]">
                 <img
-                    src="/images/illustrations/beras-impor.jpg"
+                    src="/images/illustrations/beras-impor.webp"
                     alt="Ilustrasi berbagai jenis beras premium dari PT Mustika Makmur Abadi"
                     class="absolute inset-0 h-full w-full object-cover"
                     loading="lazy"
@@ -167,48 +171,111 @@ new #[Layout('layouts::public')] class extends Component
     </section>
 
     {{-- ============================================================
-         SECTION 4: JANGKAUAN DISTRIBUSI — Map illustration background
-         Overlay gradient + teks putih. Wilayah sebagai chip/tag.
+         SECTION 4: SARANA & JANGKAUAN DISTRIBUSI — Clean Light Logistics Architecture
+         Harmonious with PT Mustika white & corporate blue palette:
+         - Soft slate-50 background with subtle border separation
+         - High-contrast crisp white cards with soft elevation
+         - Official distributor status & transparent SLA
          ============================================================ --}}
-    <section class="relative min-h-[480px] overflow-hidden sm:min-h-[520px]">
-        <img
-            src="/images/illustrations/peta-distribusi.jpg"
-            alt="Peta distribusi PT Mustika Makmur Abadi di Indonesia bagian timur"
-            class="absolute inset-0 h-full w-full object-cover"
-            loading="lazy"
-        >
-        <div class="overlay-bottom absolute inset-0"></div>
-
-        <div class="relative z-10 mx-auto flex max-w-6xl flex-col justify-end px-4 py-14 sm:px-6 sm:py-20">
-            <div class="reveal">
-                <h2 class="heading-display font-display text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">
-                    {{ $this->distribusi?->title ?? 'Jangkauan Distribusi' }}
+    <section class="border-y border-slate-200/80 bg-slate-50/80 py-16 sm:py-20 dark:border-zinc-800 dark:bg-zinc-900/60">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+            {{-- Section Header --}}
+            <div class="max-w-3xl reveal">
+                <span class="inline-flex items-center gap-2 rounded-lg border border-blue-200/80 bg-blue-50 px-3 py-1 text-xs font-bold tracking-wide text-blue-700 dark:border-blue-800/40 dark:bg-blue-950/40 dark:text-blue-300">
+                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.25V4.875c0-.621-.504-1.125-1.125-1.125H4.5a1.125 1.125 0 0 0-1.125 1.125v10.5c0 .621.504 1.125 1.125 1.125h.75"/></svg>
+                    Sistem Rantai Pasok & Distribusi
+                </span>
+                <h2 class="heading-display font-display mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl lg:text-5xl dark:text-white">
+                    {{ $this->distribusi?->title ?? 'Sarana & Jangkauan Distribusi' }}
                 </h2>
-                <p class="mt-3 max-w-lg text-lg text-white/85">
-                    {{ $this->distribusi?->body ?? 'Dari pusat distribusi di Sidoarjo, produk kami menjangkau 8 wilayah Indonesia bagian timur.' }}
+                <p class="mt-4 text-base sm:text-lg leading-relaxed text-slate-600 dark:text-zinc-300">
+                    {{ $this->distribusi?->body ?? 'Kami memiliki armada pengiriman sendiri (1 truk box besar dan 1 truk box kecil) yang melayani pengiriman gratis ongkir untuk wilayah Surabaya, Sidoarjo, Gresik, Malang, dan Mojokerto, Senin–Sabtu. Untuk wilayah di luar area tersebut, pengiriman dilakukan melalui ekspedisi rekanan.' }}
                 </p>
             </div>
 
-            <div class="mt-8 flex flex-wrap gap-2 reveal">
-                @foreach ($this->distributionRegions as $region)
-                    <span class="rounded-lg bg-white/20 px-4 py-2 text-sm font-bold text-white backdrop-blur-sm">{{ $region }}</span>
-                @endforeach
+            {{-- 3 Feature Cards --}}
+            <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 reveal">
+                {{-- Card 1: Armada Sendiri --}}
+                <div class="group rounded-2xl border border-slate-200/90 bg-white p-7 shadow-xs transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-800">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.25V4.875c0-.621-.504-1.125-1.125-1.125H4.5a1.125 1.125 0 0 0-1.125 1.125v10.5c0 .621.504 1.125 1.125 1.125h.75"/></svg>
+                    </div>
+                    <div class="mt-5">
+                        <span class="inline-block rounded-md border border-amber-200/80 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-800 dark:border-amber-800/40 dark:bg-amber-950/40 dark:text-amber-300">Armada Sendiri</span>
+                        <h3 class="mt-2 text-xl font-bold text-slate-900 dark:text-white">2 Unit Truk Box</h3>
+                        <p class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-zinc-400">
+                            1 unit truk box besar dan 1 unit truk box kecil untuk pengiriman higienis, terlindung cuaca, dan proteksi produk prima.
+                        </p>
+                    </div>
+                    <div class="mt-6 border-t border-slate-100 pt-4 dark:border-zinc-700/60">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 dark:text-zinc-400">Jadwal Operasional:</span>
+                            <span class="font-bold text-amber-700 dark:text-amber-400">Senin – Sabtu</span>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card 2: Gratis Ongkir --}}
+                <div class="group relative overflow-hidden rounded-2xl border border-emerald-200 bg-white p-7 shadow-xs transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-emerald-800/60 dark:bg-zinc-800">
+                    <div class="absolute top-0 left-0 h-1.5 w-full bg-emerald-500"></div>
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                    </div>
+                    <div class="mt-5">
+                        <span class="inline-block rounded-md border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-300">Bebas Biaya Kirim</span>
+                        <h3 class="mt-2 text-xl font-bold text-slate-900 dark:text-white">Area Surabaya Raya</h3>
+                        <p class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-zinc-400">
+                            Pengiriman langsung dari pusat pergudangan tanpa biaya kirim untuk mitra ritel & grosir di wilayah strategis Jawa Timur.
+                        </p>
+                    </div>
+                    <div class="mt-6 border-t border-slate-100 pt-4 dark:border-zinc-700/60">
+                        <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                            {{ SiteSetting::get('distribution_free_area', 'Surabaya, Sidoarjo, Gresik, Malang, Mojokerto') }}
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Card 3: 8 Wilayah Distribusi --}}
+                <div class="group rounded-2xl border border-slate-200/90 bg-white p-7 shadow-xs transition duration-200 hover:-translate-y-0.5 hover:shadow-md sm:col-span-2 lg:col-span-1 dark:border-zinc-800 dark:bg-zinc-800">
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z"/></svg>
+                    </div>
+                    <div class="mt-5">
+                        <span class="inline-block rounded-md border border-blue-200/80 bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-800 dark:border-blue-800/40 dark:bg-blue-950/40 dark:text-blue-300">Jangkauan Luas</span>
+                        <h3 class="mt-2 text-xl font-bold text-slate-900 dark:text-white">8 Wilayah Indonesia Timur</h3>
+                        <p class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-zinc-400">
+                            Bermitra dengan ekspedisi kargo darat dan laut terpercaya untuk menyuplai 355+ outlet aktif di kepulauan timur nusantara.
+                        </p>
+                    </div>
+                    <div class="mt-6 border-t border-slate-100 pt-4 dark:border-zinc-700/60">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 dark:text-zinc-400">Jalur Distribusi:</span>
+                            <span class="font-bold text-blue-700 dark:text-blue-400">Ekspedisi Rekanan Resmi</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="mt-6 flex flex-wrap gap-6 reveal">
-                @if ($freeArea = SiteSetting::get('distribution_free_area'))
-                    <div class="rounded-xl bg-sun-500/90 px-5 py-3 backdrop-blur-sm">
-                        <p class="text-sm font-extrabold text-slate-900">Gratis Ongkir</p>
-                        <p class="text-xs text-slate-800">{{ $freeArea }}</p>
+            {{-- Regional Coverage Chips Grid --}}
+            <div class="mt-10 rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xs dark:border-zinc-800 dark:bg-zinc-800/90 reveal">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h4 class="text-xs sm:text-sm font-bold tracking-wider text-slate-800 uppercase dark:text-white">Wilayah Cakupan Distribusi Aktif</h4>
+                        <p class="text-xs text-slate-500 mt-0.5 dark:text-zinc-400">Pengiriman terjadwal ke mitra ritel, supermarket, hotel, dan restoran.</p>
                     </div>
-                @endif
-                <div class="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-sm">
-                    <p class="text-sm font-extrabold text-white">Senin – Sabtu</p>
-                    <p class="text-xs text-white/70">Jadwal Pengiriman</p>
+                    <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-300">
+                        <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Hub Utama: SIRIE Sidoarjo
+                    </span>
                 </div>
-                <div class="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-sm">
-                    <p class="text-sm font-extrabold text-white">2 Unit Truk Box</p>
-                    <p class="text-xs text-white/70">Armada Sendiri</p>
+
+                <div class="mt-6 flex flex-wrap gap-2.5">
+                    @foreach ($this->distributionRegions as $region)
+                        <div class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-2xs transition hover:border-blue-400 hover:bg-blue-50/60 hover:text-blue-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700">
+                            <svg class="h-3.5 w-3.5 text-blue-600 shrink-0 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+                            <span>{{ $region }}</span>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -223,7 +290,7 @@ new #[Layout('layouts::public')] class extends Component
             {{-- Foto tim asli yang dipercantik --}}
             <div class="relative min-h-[380px] lg:min-h-[520px]">
                 <img
-                    src="/images/gudang/gudang-tim.jpg"
+                    src="/images/gudang/gudang-tim.webp"
                     alt="Tim PT Mustika Makmur Abadi sedang memproses pesanan di gudang Sidoarjo"
                     class="absolute inset-0 h-full w-full object-cover"
                     loading="lazy"
@@ -297,7 +364,7 @@ new #[Layout('layouts::public')] class extends Component
                 {{-- Large feature photo: pintu masuk --}}
                 <div class="group relative overflow-hidden rounded-2xl sm:col-span-2 lg:col-span-2 lg:row-span-1">
                     <img
-                        src="/images/gudang/gudang-eksterior.jpg?v={{ file_exists(public_path('images/gudang/gudang-eksterior.jpg')) ? filemtime(public_path('images/gudang/gudang-eksterior.jpg')) : '2' }}"
+                        src="/images/gudang/gudang-eksterior.webp?v={{ file_exists(public_path('images/gudang/gudang-eksterior.webp')) ? filemtime(public_path('images/gudang/gudang-eksterior.webp')) : '2' }}"
                         alt="Eksterior gudang PT Mustika Makmur Abadi, Kawasan Industri SIRIE Sidoarjo"
                         class="h-72 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-80"
                         loading="lazy"
@@ -312,7 +379,7 @@ new #[Layout('layouts::public')] class extends Component
                 {{-- Pintu masuk close-up --}}
                 <div class="group relative overflow-hidden rounded-2xl">
                     <img
-                        src="/images/gudang/gudang-pintu-masuk.jpg"
+                        src="/images/gudang/gudang-pintu-masuk.webp"
                         alt="Pintu masuk kantor PT Mustika Makmur Abadi dengan papan nama resmi"
                         class="h-72 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-80"
                         loading="lazy"
@@ -327,7 +394,7 @@ new #[Layout('layouts::public')] class extends Component
                 {{-- Interior gudang --}}
                 <div class="group relative overflow-hidden rounded-2xl sm:col-span-2 lg:col-span-3">
                     <img
-                        src="/images/gudang/gudang-interior.jpg"
+                        src="/images/gudang/gudang-interior.webp"
                         alt="Interior gudang PT Mustika Makmur Abadi yang penuh dengan stok produk siap distribusi"
                         class="h-64 w-full object-cover transition duration-500 group-hover:scale-105"
                         loading="lazy"

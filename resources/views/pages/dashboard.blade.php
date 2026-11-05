@@ -99,6 +99,12 @@ new #[Title('Dashboard')] class extends Component
     }
 
     #[Computed]
+    public function unreadContactMessagesCount(): int
+    {
+        return \App\Models\ContactMessage::where('status', \App\Enums\ContactMessageStatus::New)->count();
+    }
+
+    #[Computed]
     public function financialMetrics(): array
     {
         $selisihOrderIds = ReconciliationRecord::where('match_status', ReconciliationStatus::Selisih)->pluck('order_id');
@@ -155,6 +161,26 @@ new #[Title('Dashboard')] class extends Component
             </div>
             <flux:button size="sm" variant="primary" :href="route('admin.warehouse.index')" wire:navigate>
                 {{ __('Proses di Gudang Sekarang') }}
+            </flux:button>
+        </div>
+    @endif
+
+    {{-- New Contact Messages Banner (For Owner & Admin Marketplace) --}}
+    @if (! $this->isGudangOnly && $this->unreadContactMessagesCount > 0)
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50/70 p-4 text-blue-900 shadow-xs dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-200">
+            <div class="flex items-center gap-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white font-bold">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </span>
+                <div>
+                    <h4 class="text-sm font-bold">{{ __('Pesan Kontak Baru: :count Pesan Masuk', ['count' => $this->unreadContactMessagesCount]) }}</h4>
+                    <p class="text-xs text-blue-800 dark:text-blue-300">
+                        {{ __('Terdapat pertanyaan kemitraan atau pemesanan dari form kontak publik yang belum ditanggapi.') }}
+                    </p>
+                </div>
+            </div>
+            <flux:button size="sm" variant="primary" :href="route('admin.messages.index')" wire:navigate>
+                {{ __('Buka Pesan Masuk') }}
             </flux:button>
         </div>
     @endif

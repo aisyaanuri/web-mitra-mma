@@ -87,13 +87,13 @@ new #[Layout('layouts::public')] class extends Component
 
 <div>
     {{-- ============================================================
-         SECTION 1: HERO — Team illustration background with overlay
+         SECTION 1: HERO — Authentic team photo background with overlay
          ============================================================ --}}
-    <section class="relative min-h-[400px] overflow-hidden sm:min-h-[480px]">
+    <section class="relative min-h-[420px] overflow-hidden sm:min-h-[480px]">
         <img
-            src="/images/illustrations/tim-mustika.jpg"
-            alt="Ilustrasi tim PT Mustika Makmur Abadi"
-            class="absolute inset-0 h-full w-full object-cover object-top"
+            src="/images/gudang/gudang-tim.webp"
+            alt="Tim operasional dan manajemen PT Mustika Makmur Abadi di gudang Sidoarjo"
+            class="absolute inset-0 h-full w-full object-cover object-center"
             fetchpriority="high"
         >
         <div class="overlay-left absolute inset-0"></div>

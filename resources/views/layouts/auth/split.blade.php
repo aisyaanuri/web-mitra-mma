@@ -41,7 +41,7 @@
                         {{-- Bottom 3D Truck Asset --}}
                         <div class="relative z-10 mt-6 lg:mt-auto pt-6 flex justify-center items-end">
                             <img
-                                src="{{ asset('images/illustrations/truck-3d.jpg') }}"
+                                src="{{ asset('images/illustrations/truck-3d.webp') }}"
                                 alt="Distribusi PT Mustika Makmur Abadi"
                                 class="w-full max-w-[320px] sm:max-w-[360px] object-contain drop-shadow-xl transition duration-500 hover:scale-105"
                             >

@@ -4,7 +4,7 @@
         <div>
             <a href="{{ route('home') }}" wire:navigate class="inline-flex items-center gap-3">
                 <img
-                    src="{{ asset('images/logo-mustika-square.png') }}"
+                    src="{{ asset('images/logo-mustika-square.webp') }}"
                     alt="{{ config('app.name') }}"
                     class="h-10 w-10 rounded-xl object-contain bg-white shadow-xs border border-slate-100 p-0.5"
                 >

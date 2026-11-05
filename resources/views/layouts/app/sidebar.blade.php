@@ -46,6 +46,18 @@
                         {{ __('Retur') }}
                     </flux:sidebar.item>
 
+                    @if (auth()->user()->hasRole(\App\Enums\UserRole::Owner, \App\Enums\UserRole::AdminMarketplace))
+                        <flux:sidebar.item icon="envelope" :href="route('admin.messages.index')" :current="request()->routeIs('admin.messages.*')" wire:navigate>
+                            {{ __('Pesan Kontak') }}
+                            @php
+                                $newContactCount = \App\Models\ContactMessage::where('status', \App\Enums\ContactMessageStatus::New)->count();
+                            @endphp
+                            @if ($newContactCount > 0)
+                                <flux:badge size="sm" color="amber" class="ml-auto">{{ $newContactCount }}</flux:badge>
+                            @endif
+                        </flux:sidebar.item>
+                    @endif
+
                     @if (auth()->user()->isOwner())
                         <flux:sidebar.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
                             {{ __('Pengguna') }}
