@@ -362,23 +362,29 @@ class ProductSeeder extends Seeder
 
             $sourcePath = $yummyRoot.'/'.$item['source'];
 
-            if (! File::exists($sourcePath)) {
-                continue;
-            }
-
             $webpPath = $targetDir.'/'.$item['slug'].'.webp';
+            $pngPath = $targetDir.'/'.$item['slug'].'.png';
+            $jpgPath = $targetDir.'/'.$item['slug'].'.jpg';
+
+            $storedPath = null;
             if (File::exists(storage_path('app/public/'.$webpPath))) {
                 $storedPath = $webpPath;
-            } else {
+            } elseif (File::exists(storage_path('app/public/'.$pngPath))) {
+                $storedPath = $pngPath;
+            } elseif (File::exists(storage_path('app/public/'.$jpgPath))) {
+                $storedPath = $jpgPath;
+            } elseif (File::exists($sourcePath)) {
                 $extension = File::extension($sourcePath);
                 $storedPath = $targetDir.'/'.$item['slug'].'.'.$extension;
                 File::copy($sourcePath, storage_path('app/public/'.$storedPath));
             }
 
-            ProductImage::updateOrCreate(
-                ['product_id' => $product->id, 'sort_order' => 0],
-                ['image_path' => $storedPath, 'alt_text' => $item['name']]
-            );
+            if ($storedPath) {
+                ProductImage::updateOrCreate(
+                    ['product_id' => $product->id, 'sort_order' => 0],
+                    ['image_path' => $storedPath, 'alt_text' => $item['name']]
+                );
+            }
         }
 
         foreach (self::BERAS_PRODUCTS as $item) {
@@ -400,23 +406,29 @@ class ProductSeeder extends Seeder
 
             $sourcePath = $berasRoot.'/'.$item['source'];
 
-            if (! File::exists($sourcePath)) {
-                continue;
-            }
-
             $webpPath = $targetDir.'/'.$item['slug'].'.webp';
+            $pngPath = $targetDir.'/'.$item['slug'].'.png';
+            $jpgPath = $targetDir.'/'.$item['slug'].'.jpg';
+
+            $storedPath = null;
             if (File::exists(storage_path('app/public/'.$webpPath))) {
                 $storedPath = $webpPath;
-            } else {
+            } elseif (File::exists(storage_path('app/public/'.$pngPath))) {
+                $storedPath = $pngPath;
+            } elseif (File::exists(storage_path('app/public/'.$jpgPath))) {
+                $storedPath = $jpgPath;
+            } elseif (File::exists($sourcePath)) {
                 $extension = File::extension($sourcePath);
                 $storedPath = $targetDir.'/'.$item['slug'].'.'.$extension;
                 File::copy($sourcePath, storage_path('app/public/'.$storedPath));
             }
 
-            ProductImage::updateOrCreate(
-                ['product_id' => $product->id, 'sort_order' => 0],
-                ['image_path' => $storedPath, 'alt_text' => $item['name']]
-            );
+            if ($storedPath) {
+                ProductImage::updateOrCreate(
+                    ['product_id' => $product->id, 'sort_order' => 0],
+                    ['image_path' => $storedPath, 'alt_text' => $item['name']]
+                );
+            }
         }
     }
 }
