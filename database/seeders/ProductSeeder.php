@@ -371,8 +371,6 @@ class ProductSeeder extends Seeder
                 continue;
             }
 
-            $storedPath = null;
-
             if (File::exists($storedWebpPath)) {
                 $storedPath = $webpPath;
             } else {
@@ -381,12 +379,10 @@ class ProductSeeder extends Seeder
                 File::copy($sourcePath, storage_path('app/public/'.$storedPath));
             }
 
-            if ($storedPath) {
-                ProductImage::updateOrCreate(
-                    ['product_id' => $product->id, 'sort_order' => 0],
-                    ['image_path' => $storedPath, 'alt_text' => $item['name']]
-                );
-            }
+            ProductImage::updateOrCreate(
+                ['product_id' => $product->id, 'sort_order' => 0],
+                ['image_path' => $storedPath, 'alt_text' => $item['name']]
+            );
         }
 
         foreach (self::BERAS_PRODUCTS as $item) {
@@ -417,7 +413,6 @@ class ProductSeeder extends Seeder
                 continue;
             }
 
-            $storedPath = null;
             if (File::exists($storedWebpPath)) {
                 $storedPath = $webpPath;
             } else {
@@ -426,12 +421,10 @@ class ProductSeeder extends Seeder
                 File::copy($sourcePath, storage_path('app/public/'.$storedPath));
             }
 
-            if ($storedPath) {
-                ProductImage::updateOrCreate(
-                    ['product_id' => $product->id, 'sort_order' => 0],
-                    ['image_path' => $storedPath, 'alt_text' => $item['name']]
-                );
-            }
+            ProductImage::updateOrCreate(
+                ['product_id' => $product->id, 'sort_order' => 0],
+                ['image_path' => $storedPath, 'alt_text' => $item['name']]
+            );
         }
     }
 }
