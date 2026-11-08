@@ -2,7 +2,7 @@
     <div class="flex flex-col gap-6">
         {{-- Brand Logo & Name --}}
         <div>
-            <a href="{{ route('home') }}" wire:navigate class="inline-flex items-center gap-3">
+            <a href="{{ route('home') }}" class="inline-flex items-center gap-3">
                 <img
                     src="{{ asset('images/logo-mustika-square.webp') }}"
                     alt="{{ config('app.name') }}"
@@ -45,6 +45,9 @@
                     autocomplete="email"
                     placeholder="email@example.com"
                 />
+                @error('email')
+                    <p class="mt-2 text-xs font-medium text-rose-500 dark:text-rose-400">{{ $message }}</p>
+                @enderror
             </div>
 
             <!-- Password -->
@@ -58,6 +61,9 @@
                     placeholder="••••••••"
                     viewable
                 />
+                @error('password')
+                    <p class="mt-2 text-xs font-medium text-rose-500 dark:text-rose-400">{{ $message }}</p>
+                @enderror
             </div>
 
             <!-- Remember Me & Forgot Password -->
@@ -65,7 +71,7 @@
                 <flux:checkbox name="remember" label="Remember me" :checked="old('remember')" />
 
                 @if (Route::has('password.request'))
-                    <flux:link class="text-xs font-semibold text-[#1065e2] hover:underline dark:text-blue-400" :href="route('password.request')" wire:navigate>
+                    <flux:link class="text-xs font-semibold text-[#1065e2] hover:underline dark:text-blue-400" :href="route('password.request')">
                         Forgot your password?
                     </flux:link>
                 @endif

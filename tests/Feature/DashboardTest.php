@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Enums\UserRole;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -27,26 +30,27 @@ class DashboardTest extends TestCase
 
     public function test_dashboard_displays_sla_overdue_warning_for_stuck_orders(): void
     {
-        $owner = User::factory()->role(\App\Enums\UserRole::Owner)->create();
+        $owner = User::factory()->role(UserRole::Owner)->create();
 
-        \App\Models\Order::factory()->create([
+        Order::factory()->create([
             'order_placed_at' => now()->subHours(36),
             'warehouse_status' => null,
             'marketplace_status' => 'READY_TO_SHIP',
         ]);
 
-        \Livewire\Livewire::actingAs($owner)
-            ->test('pages::dashboard')
+        $this->actingAs($owner)
+            ->get(route('dashboard'))
+            ->assertOk()
             ->assertSee('Peringatan SLA Gudang')
             ->assertSee('Mengendap > 24 Jam');
     }
 
     public function test_dashboard_displays_top_selling_products(): void
     {
-        $owner = User::factory()->role(\App\Enums\UserRole::Owner)->create();
-        $order = \App\Models\Order::factory()->create(['marketplace_status' => 'COMPLETED']);
+        $owner = User::factory()->role(UserRole::Owner)->create();
+        $order = Order::factory()->create(['marketplace_status' => 'COMPLETED']);
 
-        \App\Models\OrderItem::factory()->create([
+        OrderItem::factory()->create([
             'order_id' => $order->id,
             'item_name' => 'Beras Organik Mentik Wangi 5kg',
             'sku' => 'BOMW-5KG',
@@ -54,8 +58,9 @@ class DashboardTest extends TestCase
             'subtotal' => 3750000,
         ]);
 
-        \Livewire\Livewire::actingAs($owner)
-            ->test('pages::dashboard')
+        $this->actingAs($owner)
+            ->get(route('dashboard'))
+            ->assertOk()
             ->assertSee('Produk Terlaris')
             ->assertSee('Beras Organik Mentik Wangi 5kg')
             ->assertSee('BOMW-5KG')

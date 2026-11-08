@@ -62,9 +62,11 @@ class Product extends Model
                 $val = $m[2];
                 if (stripos($val, 'Alergen:') !== false) {
                     $parts = preg_split('/(?:\.|\n)\s*Alergen:\s*/i', $val);
-                    $details[] = ['label' => $m[1], 'value' => trim($parts[0])];
-                    if (isset($parts[1])) {
-                        $details[] = ['label' => 'Alergen', 'value' => trim($parts[1], " \t\n\r\0\x0B.")];
+                    if ($parts !== false && isset($parts[0])) {
+                        $details[] = ['label' => $m[1], 'value' => trim($parts[0])];
+                        if (isset($parts[1])) {
+                            $details[] = ['label' => 'Alergen', 'value' => trim($parts[1], " \t\n\r\0\x0B.")];
+                        }
                     }
                 } else {
                     $details[] = ['label' => $m[1], 'value' => trim($val, " \t\n\r\0\x0B.")];

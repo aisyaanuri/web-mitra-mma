@@ -1,139 +1,6 @@
-<?php
+@extends('layouts.app')
+@section('content')
 
-use App\Enums\ReconciliationStatus;
-use App\Enums\UserRole;
-use App\Enums\WarehouseStatus;
-use App\Models\Order;
-use App\Models\ReconciliationRecord;
-use Illuminate\Support\Facades\Auth;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\Title;
-use Livewire\Component;
-
-new #[Title('Dashboard')] class extends Component
-{
-    #[Computed]
-    public function isGudangOnly(): bool
-    {
-        return Auth::user()->role === UserRole::AdminGudang;
-    }
-
-    #[Computed]
-    public function totalOrders(): int
-    {
-        return Order::count();
-    }
-
-    /**
-     * @return array<string, int>
-     */
-    #[Computed]
-    public function warehouseBreakdown(): array
-    {
-        $counts = Order::query()
-            ->selectRaw('warehouse_status, count(*) as total')
-            ->groupBy('warehouse_status')
-            ->pluck('total', 'warehouse_status');
-
-        $breakdown = ['belum_diproses' => (int) ($counts[null] ?? 0)];
-
-        foreach (WarehouseStatus::cases() as $case) {
-            $breakdown[$case->value] = (int) ($counts[$case->value] ?? 0);
-        }
-
-        return $breakdown;
-    }
-
-    /**
-     * @return array{labels: array<int, string>, data: array<int, float>}
-     */
-    #[Computed]
-    public function salesChartData(): array
-    {
-        // Grouped in PHP rather than via a DB-specific date-formatting
-        // function, so this doesn't depend on which database is active
-        // (production runs MySQL, but tests run against SQLite).
-        $monthlyTotals = Order::query()
-            ->whereNotIn('marketplace_status', ['CANCELLED', 'UNPAID'])
-            ->where('order_placed_at', '>=', now()->subMonths(5)->startOfMonth())
-            ->get(['order_placed_at', 'total_amount'])
-            ->groupBy(fn (Order $order) => $order->order_placed_at->format('Y-m'))
-            ->map(fn ($orders) => $orders->sum('total_amount'));
-
-        $labels = [];
-        $data = [];
-
-        for ($i = 5; $i >= 0; $i--) {
-            $month = now()->subMonths($i);
-            $labels[] = $month->translatedFormat('M Y');
-            $data[] = (float) ($monthlyTotals[$month->format('Y-m')] ?? 0);
-        }
-
-        return ['labels' => $labels, 'data' => $data];
-    }
-
-    /**
-     * @return array<string, int>
-     */
-    #[Computed]
-    public function reconciliationBreakdown(): array
-    {
-        return [
-            'sesuai' => ReconciliationRecord::where('match_status', ReconciliationStatus::Sesuai)->count(),
-            'selisih' => ReconciliationRecord::where('match_status', ReconciliationStatus::Selisih)->count(),
-            'belum_dicek' => ReconciliationRecord::where('match_status', ReconciliationStatus::BelumDicek)->count(),
-        ];
-    }
-
-    #[Computed]
-    public function overdueOrdersCount(): int
-    {
-        return Order::query()
-            ->where(function ($q) {
-                $q->whereNull('warehouse_status')
-                    ->orWhere('warehouse_status', '!=', WarehouseStatus::Dikirim->value);
-            })
-            ->whereNotIn('marketplace_status', ['CANCELLED', 'IN_CANCEL', 'UNPAID'])
-            ->where('order_placed_at', '<', now()->subHours(24))
-            ->count();
-    }
-
-    #[Computed]
-    public function unreadContactMessagesCount(): int
-    {
-        return \App\Models\ContactMessage::where('status', \App\Enums\ContactMessageStatus::New)->count();
-    }
-
-    #[Computed]
-    public function financialMetrics(): array
-    {
-        $selisihOrderIds = ReconciliationRecord::where('match_status', ReconciliationStatus::Selisih)->pluck('order_id');
-        $selisihAmount = Order::whereIn('id', $selisihOrderIds)->sum('total_amount');
-        $returnAmount = \App\Models\OrderReturn::sum('refund_amount');
-
-        return [
-            'selisih_amount' => (float) $selisihAmount,
-            'return_amount' => (float) $returnAmount,
-        ];
-    }
-
-    /**
-     * @return \Illuminate\Support\Collection<int, object>
-     */
-    #[Computed]
-    public function topProducts(): \Illuminate\Support\Collection
-    {
-        return \App\Models\OrderItem::query()
-            ->whereHas('order', function ($q) {
-                $q->whereNotIn('marketplace_status', ['CANCELLED', 'UNPAID']);
-            })
-            ->selectRaw('item_name, sku, sum(quantity) as total_qty, sum(subtotal) as total_sales')
-            ->groupBy('item_name', 'sku')
-            ->orderByDesc('total_qty')
-            ->limit(5)
-            ->get();
-    }
-}; ?>
 
 <div class="flex h-full w-full flex-1 flex-col gap-6">
     <div class="flex flex-wrap items-center justify-between gap-4">
@@ -146,40 +13,40 @@ new #[Title('Dashboard')] class extends Component
     </div>
 
     {{-- Overdue Fulfillment SLA Warning Banner --}}
-    @if ($this->overdueOrdersCount > 0)
+    @if ($overdueOrdersCount > 0)
         <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900 shadow-xs dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200">
             <div class="flex items-center gap-3">
                 <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-white font-bold">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </span>
                 <div>
-                    <h4 class="text-sm font-bold">{{ __('Peringatan SLA Gudang: :count Pesanan Mengendap > 24 Jam', ['count' => $this->overdueOrdersCount]) }}</h4>
+                    <h4 class="text-sm font-bold">{{ __('Peringatan SLA Gudang: :count Pesanan Mengendap > 24 Jam', ['count' => $overdueOrdersCount]) }}</h4>
                     <p class="text-xs text-amber-800 dark:text-amber-300">
                         {{ __('Pesanan telah masuk lebih dari 24 jam yang lalu namun belum diserahkan ke pihak ekspedisi / kurir. Mohon segera proses untuk menghindari penalti Shopee.') }}
                     </p>
                 </div>
             </div>
-            <flux:button size="sm" variant="primary" :href="route('admin.warehouse.index')" wire:navigate>
+            <flux:button size="sm" variant="primary" :href="route('admin.warehouse.index')" >
                 {{ __('Proses di Gudang Sekarang') }}
             </flux:button>
         </div>
     @endif
 
     {{-- New Contact Messages Banner (For Owner & Admin Marketplace) --}}
-    @if (! $this->isGudangOnly && $this->unreadContactMessagesCount > 0)
+    @if (! $isGudangOnly && $unreadContactMessagesCount > 0)
         <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50/70 p-4 text-blue-900 shadow-xs dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-200">
             <div class="flex items-center gap-3">
                 <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white font-bold">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 </span>
                 <div>
-                    <h4 class="text-sm font-bold">{{ __('Pesan Kontak Baru: :count Pesan Masuk', ['count' => $this->unreadContactMessagesCount]) }}</h4>
+                    <h4 class="text-sm font-bold">{{ __('Pesan Kontak Baru: :count Pesan Masuk', ['count' => $unreadContactMessagesCount]) }}</h4>
                     <p class="text-xs text-blue-800 dark:text-blue-300">
                         {{ __('Terdapat pertanyaan kemitraan atau pemesanan dari form kontak publik yang belum ditanggapi.') }}
                     </p>
                 </div>
             </div>
-            <flux:button size="sm" variant="primary" :href="route('admin.messages.index')" wire:navigate>
+            <flux:button size="sm" variant="primary" :href="route('admin.messages.index')" >
                 {{ __('Buka Pesan Masuk') }}
             </flux:button>
         </div>
@@ -188,18 +55,18 @@ new #[Title('Dashboard')] class extends Component
     {{-- Orders by Warehouse Status Grid --}}
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-700 dark:bg-zinc-900">
-            <p class="font-display text-2xl font-bold text-zinc-900 dark:text-white">{{ $this->totalOrders }}</p>
+            <p class="font-display text-2xl font-bold text-zinc-900 dark:text-white">{{ $totalOrders }}</p>
             <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mt-1">{{ __('Total Pesanan') }}</p>
         </div>
-        @foreach (WarehouseStatus::cases() as $case)
+        @foreach (\App\Enums\WarehouseStatus::cases() as $case)
             <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-xs dark:border-zinc-700 dark:bg-zinc-900">
-                <p class="font-display text-2xl font-bold text-brand-600 dark:text-brand-400">{{ $this->warehouseBreakdown[$case->value] }}</p>
+                <p class="font-display text-2xl font-bold text-brand-600 dark:text-brand-400">{{ $warehouseBreakdown[$case->value] }}</p>
                 <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mt-1">{{ $case->label() }}</p>
             </div>
         @endforeach
     </div>
 
-    @unless ($this->isGudangOnly)
+    @unless ($isGudangOnly)
         {{-- Financial Discrepancy & Returns Valuation Grid --}}
         <div class="grid gap-4 sm:grid-cols-2">
             <div class="rounded-xl border border-rose-200 bg-rose-50/60 p-4 dark:border-rose-900/60 dark:bg-rose-950/30">
@@ -208,7 +75,7 @@ new #[Title('Dashboard')] class extends Component
                     <span class="rounded bg-rose-200/60 px-2 py-0.5 text-[10px] font-bold text-rose-800 dark:bg-rose-900 dark:text-rose-200">{{ __('Perlu Audit') }}</span>
                 </div>
                 <p class="mt-2 text-2xl font-bold font-display text-rose-900 dark:text-rose-100">
-                    Rp {{ number_format($this->financialMetrics['selisih_amount'], 0, ',', '.') }}
+                    Rp {{ number_format($financialMetrics['selisih_amount'], 0, ',', '.') }}
                 </p>
                 <p class="mt-1 text-xs text-rose-700/80 dark:text-rose-300">
                     {{ __('Nilai pesanan dengan disparitas status antara gudang dan Shopee.') }}
@@ -221,7 +88,7 @@ new #[Title('Dashboard')] class extends Component
                     <span class="rounded bg-amber-200/60 px-2 py-0.5 text-[10px] font-bold text-amber-800 dark:bg-amber-900 dark:text-amber-200">{{ __('Retur Barang') }}</span>
                 </div>
                 <p class="mt-2 text-2xl font-bold font-display text-amber-900 dark:text-amber-100">
-                    Rp {{ number_format($this->financialMetrics['return_amount'], 0, ',', '.') }}
+                    Rp {{ number_format($financialMetrics['return_amount'], 0, ',', '.') }}
                 </p>
                 <p class="mt-1 text-xs text-amber-700/80 dark:text-amber-300">
                     {{ __('Total klaim pengembalian dana pembeli yang terdaftar di Shopee.') }}
@@ -242,8 +109,8 @@ new #[Title('Dashboard')] class extends Component
                     x-init="
                         new ApexCharts($refs.salesChart, {
                             chart: { type: 'area', height: 280, toolbar: { show: false } },
-                            series: [{ name: 'Penjualan', data: @js($this->salesChartData['data']) }],
-                            xaxis: { categories: @js($this->salesChartData['labels']) },
+                            series: [{ name: 'Penjualan', data: @js($salesChartData['data']) }],
+                            xaxis: { categories: @js($salesChartData['labels']) },
                             colors: ['#1c7fc4'],
                             dataLabels: { enabled: false },
                             yaxis: { labels: { formatter: (val) => 'Rp ' + Number(val).toLocaleString('id-ID') } },
@@ -251,7 +118,7 @@ new #[Title('Dashboard')] class extends Component
                         }).render()
                     "
                     class="mt-4"
-                    wire:ignore
+
                 >
                     <div x-ref="salesChart"></div>
                 </div>
@@ -263,7 +130,7 @@ new #[Title('Dashboard')] class extends Component
                 <p class="text-xs text-zinc-400 mt-0.5">{{ __('Top 5 kuantitas terjual terbanyak') }}</p>
 
                 <div class="mt-4 divide-y divide-zinc-100 dark:divide-zinc-800">
-                    @forelse ($this->topProducts as $idx => $prod)
+                    @forelse ($topProducts as $idx => $prod)
                         <div class="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
                             <div class="flex items-center gap-2.5 min-w-0">
                                 <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-zinc-100 text-xs font-bold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
@@ -295,25 +162,27 @@ new #[Title('Dashboard')] class extends Component
                     <flux:heading size="lg" class="font-display">{{ __('Ringkasan Rekonsiliasi') }}</flux:heading>
                     <p class="text-xs text-zinc-400 mt-0.5">{{ __('Integritas data marketplace Shopee terhadap fisik pengiriman gudang') }}</p>
                 </div>
-                <flux:button size="sm" :href="route('admin.reconciliation.index')" wire:navigate>
+                <flux:button size="sm" :href="route('admin.reconciliation.index')" >
                     {{ __('Buka Modul Rekonsiliasi') }}
                 </flux:button>
             </div>
 
             <div class="mt-4 grid gap-4 sm:grid-cols-3">
                 <div class="rounded-xl bg-emerald-50 p-4 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50">
-                    <p class="font-display text-2xl font-bold text-emerald-700 dark:text-emerald-400">{{ $this->reconciliationBreakdown['sesuai'] }}</p>
+                    <p class="font-display text-2xl font-bold text-emerald-700 dark:text-emerald-400">{{ $reconciliationBreakdown['sesuai'] }}</p>
                     <p class="text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 mt-1">{{ __('Status Sesuai') }}</p>
                 </div>
                 <div class="rounded-xl bg-rose-50 p-4 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-900/50">
-                    <p class="font-display text-2xl font-bold text-rose-700 dark:text-rose-400">{{ $this->reconciliationBreakdown['selisih'] }}</p>
+                    <p class="font-display text-2xl font-bold text-rose-700 dark:text-rose-400">{{ $reconciliationBreakdown['selisih'] }}</p>
                     <p class="text-xs font-semibold uppercase tracking-wider text-rose-800 dark:text-rose-300 mt-1">{{ __('Status Selisih') }}</p>
                 </div>
                 <div class="rounded-xl bg-zinc-100 p-4 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700">
-                    <p class="font-display text-2xl font-bold text-zinc-700 dark:text-zinc-300">{{ $this->reconciliationBreakdown['belum_dicek'] }}</p>
+                    <p class="font-display text-2xl font-bold text-zinc-700 dark:text-zinc-300">{{ $reconciliationBreakdown['belum_dicek'] }}</p>
                     <p class="text-xs font-semibold uppercase tracking-wider text-zinc-600 dark:text-zinc-400 mt-1">{{ __('Belum Dicek') }}</p>
                 </div>
             </div>
         </div>
     @endunless
 </div>
+
+@endsection

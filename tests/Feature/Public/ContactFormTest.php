@@ -4,7 +4,6 @@ namespace Tests\Feature\Public;
 
 use App\Models\ContactMessage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class ContactFormTest extends TestCase
@@ -13,13 +12,13 @@ class ContactFormTest extends TestCase
 
     public function test_valid_submission_creates_contact_message(): void
     {
-        Livewire::test('pages::public.kontak')
-            ->set('name', 'Budi Santoso')
-            ->set('email', 'budi@example.com')
-            ->set('phone', '081234567890')
-            ->set('message', 'Saya tertarik menjadi mitra distribusi.')
-            ->call('submit')
-            ->assertHasNoErrors();
+        $this->post(route('kontak.store'), [
+            'name' => 'Budi Santoso',
+            'email' => 'budi@example.com',
+            'phone' => '081234567890',
+            'message' => 'Saya tertarik menjadi mitra distribusi.',
+        ])->assertRedirect(route('kontak'))
+            ->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('contact_messages', [
             'name' => 'Budi Santoso',
@@ -29,35 +28,35 @@ class ContactFormTest extends TestCase
 
     public function test_submission_requires_name_email_and_message(): void
     {
-        Livewire::test('pages::public.kontak')
-            ->set('name', '')
-            ->set('email', '')
-            ->set('message', '')
-            ->call('submit')
-            ->assertHasErrors(['name', 'email', 'message']);
+        $this->from(route('kontak'))
+            ->post(route('kontak.store'), ['name' => '', 'email' => '', 'message' => ''])
+            ->assertRedirect(route('kontak'))
+            ->assertSessionHasErrors(['name', 'email', 'message']);
 
         $this->assertSame(0, ContactMessage::count());
     }
 
     public function test_submission_requires_valid_email(): void
     {
-        Livewire::test('pages::public.kontak')
-            ->set('name', 'Budi')
-            ->set('email', 'not-an-email')
-            ->set('message', 'Halo')
-            ->call('submit')
-            ->assertHasErrors(['email']);
+        $this->from(route('kontak'))
+            ->post(route('kontak.store'), [
+                'name' => 'Budi',
+                'email' => 'not-an-email',
+                'message' => 'Halo',
+            ])
+            ->assertRedirect(route('kontak'))
+            ->assertSessionHasErrors(['email']);
     }
 
     public function test_honeypot_field_silently_blocks_submission(): void
     {
-        Livewire::test('pages::public.kontak')
-            ->set('name', 'Bot')
-            ->set('email', 'bot@example.com')
-            ->set('message', 'Spam message')
-            ->set('website', 'https://spam.example.com')
-            ->call('submit')
-            ->assertHasNoErrors();
+        $this->post(route('kontak.store'), [
+            'name' => 'Bot',
+            'email' => 'bot@example.com',
+            'message' => 'Spam message',
+            'website' => 'https://spam.example.com',
+        ])->assertRedirect(route('kontak'))
+            ->assertSessionHasNoErrors();
 
         $this->assertSame(0, ContactMessage::count());
     }

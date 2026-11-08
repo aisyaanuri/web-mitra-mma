@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Fortify\Features;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class SecurityTest extends TestCase
@@ -70,7 +69,7 @@ class SecurityTest extends TestCase
             ->assertDontSee('Two-factor authentication');
     }
 
-    public function test_two_factor_authentication_disabled_when_confirmation_abandoned_between_requests(): void
+    public function test_pending_two_factor_setup_can_be_confirmed_after_a_request_boundary(): void
     {
         $user = User::factory()->create();
 
@@ -80,17 +79,15 @@ class SecurityTest extends TestCase
             'two_factor_confirmed_at' => null,
         ])->save();
 
-        $this->actingAs($user);
+        $this->actingAs($user)
+            ->withSession(['auth.password_confirmed_at' => time()])
+            ->get(route('security.edit'))
+            ->assertOk()
+            ->assertSee(route('two-factor.qr-code'), false)
+            ->assertSee(route('two-factor.confirm'), false)
+            ->assertDontSee('Two-factor authentication is enabled');
 
-        $component = Livewire::test('pages::settings.security');
-
-        $component->assertSet('twoFactorEnabled', false);
-
-        $this->assertDatabaseHas('users', [
-            'id' => $user->id,
-            'two_factor_secret' => null,
-            'two_factor_recovery_codes' => null,
-        ]);
+        $this->assertNotNull($user->fresh()->two_factor_secret);
     }
 
     public function test_password_can_be_updated(): void
@@ -99,15 +96,14 @@ class SecurityTest extends TestCase
             'password' => Hash::make('password'),
         ]);
 
-        $this->actingAs($user);
-
-        $response = Livewire::test('pages::settings.security')
-            ->set('current_password', 'password')
-            ->set('password', 'new-password')
-            ->set('password_confirmation', 'new-password')
-            ->call('updatePassword');
-
-        $response->assertHasNoErrors();
+        $this->actingAs($user)
+            ->put(route('settings.password.update'), [
+                'current_password' => 'password',
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
 
         $this->assertTrue(Hash::check('new-password', $user->refresh()->password));
     }
@@ -120,12 +116,14 @@ class SecurityTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = Livewire::test('pages::settings.security')
-            ->set('current_password', 'wrong-password')
-            ->set('password', 'new-password')
-            ->set('password_confirmation', 'new-password')
-            ->call('updatePassword');
-
-        $response->assertHasErrors(['current_password']);
+        $this->actingAs($user)
+            ->from(route('security.edit'))
+            ->put(route('settings.password.update'), [
+                'current_password' => 'wrong-password',
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ])
+            ->assertRedirect(route('security.edit'))
+            ->assertSessionHasErrors(['current_password']);
     }
 }

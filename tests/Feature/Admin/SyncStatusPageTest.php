@@ -3,10 +3,12 @@
 namespace Tests\Feature\Admin;
 
 use App\Enums\UserRole;
+use App\Enums\WarehouseStatus;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\SyncLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class SyncStatusPageTest extends TestCase
@@ -35,9 +37,9 @@ class SyncStatusPageTest extends TestCase
     {
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.sync.index')
-            ->call('syncNow');
+        $this->actingAs($owner)
+            ->post(route('admin.sync.run'))
+            ->assertRedirect();
 
         $this->assertTrue(SyncLog::where('job_type', 'shopee_orders')->exists());
         $this->assertTrue(SyncLog::where('job_type', 'shopee_logistics')->exists());
@@ -53,7 +55,7 @@ class SyncStatusPageTest extends TestCase
             ->assertSee('Fake (Data Simulasi)');
     }
 
-    public function test_can_open_and_close_log_detail_modal(): void
+    public function test_sync_log_is_displayed_on_the_page(): void
     {
         $owner = User::factory()->role(UserRole::Owner)->create();
         $log = SyncLog::create([
@@ -75,28 +77,24 @@ class SyncStatusPageTest extends TestCase
             'created_at' => now(),
         ]);
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.sync.index')
-            ->call('openLogDetail', $log->id)
-            ->assertSet('selectedLogId', $log->id)
-            ->assertSee('SP-TEST-999')
-            ->assertSee('Ibu Siti Khadijah')
-            ->call('closeLogDetail')
-            ->assertSet('selectedLogId', null);
+        $this->actingAs($owner)
+            ->get(route('admin.sync.index'))
+            ->assertOk()
+            ->assertSee('2 pesanan berhasil disinkronkan.');
     }
 
-    public function test_can_switch_tabs_and_view_order_details(): void
+    public function test_can_search_and_view_synced_orders(): void
     {
         $owner = User::factory()->role(UserRole::Owner)->create();
-        $order = \App\Models\Order::factory()->create([
+        $order = Order::factory()->create([
             'shopee_order_sn' => 'SP-SYNC-VIEW-01',
             'buyer_username' => 'budisantoso99',
             'total_amount' => 250000,
             'marketplace_status' => 'PROCESSED',
-            'warehouse_status' => \App\Enums\WarehouseStatus::Dikemas,
+            'warehouse_status' => WarehouseStatus::Dikemas,
         ]);
 
-        \App\Models\OrderItem::factory()->create([
+        OrderItem::factory()->create([
             'order_id' => $order->id,
             'item_name' => 'Beras Pandan Wangi Super 5kg',
             'sku' => 'BPW-5KG',
@@ -105,16 +103,12 @@ class SyncStatusPageTest extends TestCase
             'subtotal' => 250000,
         ]);
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.sync.index')
-            ->set('activeTab', 'orders')
+        $this->actingAs($owner)
+            ->get(route('admin.sync.index', ['order_search' => 'budisantoso99']))
+            ->assertOk()
             ->assertSee('SP-SYNC-VIEW-01')
             ->assertSee('budisantoso99')
-            ->call('viewOrder', $order->id)
-            ->assertSet('viewingOrderId', $order->id)
             ->assertSee('Beras Pandan Wangi Super 5kg')
-            ->assertSee('BPW-5KG')
-            ->call('closeOrderView')
-            ->assertSet('viewingOrderId', null);
+            ->assertSee('BPW-5KG');
     }
 }

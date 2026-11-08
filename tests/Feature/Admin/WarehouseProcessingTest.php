@@ -5,11 +5,11 @@ namespace Tests\Feature\Admin;
 use App\Enums\UserRole;
 use App\Enums\WarehouseStatus;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Shipment;
 use App\Models\User;
 use App\Models\WarehouseProcessLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class WarehouseProcessingTest extends TestCase
@@ -27,16 +27,18 @@ class WarehouseProcessingTest extends TestCase
 
     public function test_owner_can_view_but_not_update_status(): void
     {
-        $order = Order::factory()->create(['warehouse_status' => null]);
+        $order = Order::factory()->create([
+            'marketplace_status' => 'READY_TO_SHIP',
+            'warehouse_status' => null,
+        ]);
         $owner = User::factory()->role(UserRole::Owner)->create();
 
         $this->actingAs($owner)
             ->get(route('admin.warehouse.index'))
             ->assertOk();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.warehouse.index')
-            ->call('markReceived', $order->id)
+        $this->actingAs($owner)
+            ->patch(route('admin.warehouse.receive', $order))
             ->assertForbidden();
 
         $this->assertNull($order->fresh()->warehouse_status);
@@ -44,12 +46,15 @@ class WarehouseProcessingTest extends TestCase
 
     public function test_admin_gudang_can_mark_order_as_received(): void
     {
-        $order = Order::factory()->create(['warehouse_status' => null]);
+        $order = Order::factory()->create([
+            'marketplace_status' => 'READY_TO_SHIP',
+            'warehouse_status' => null,
+        ]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->call('markReceived', $order->id);
+        $this->actingAs($user)
+            ->patch(route('admin.warehouse.receive', $order))
+            ->assertRedirect();
 
         $order->refresh();
         $this->assertSame(WarehouseStatus::Diterima, $order->warehouse_status);
@@ -67,15 +72,13 @@ class WarehouseProcessingTest extends TestCase
         $order = Order::factory()->create(['warehouse_status' => WarehouseStatus::Diterima]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        $component = Livewire::actingAs($user)->test('pages::admin.warehouse.index');
-
-        $component->call('advance', $order->id);
+        $this->actingAs($user)->patch(route('admin.warehouse.advance', $order))->assertRedirect();
         $this->assertSame(WarehouseStatus::Dikemas, $order->fresh()->warehouse_status);
 
-        $component->call('advance', $order->id);
+        $this->actingAs($user)->patch(route('admin.warehouse.advance', $order))->assertRedirect();
         $this->assertSame(WarehouseStatus::SiapKirim, $order->fresh()->warehouse_status);
 
-        $component->call('advance', $order->id);
+        $this->actingAs($user)->patch(route('admin.warehouse.advance', $order))->assertRedirect();
         $this->assertSame(WarehouseStatus::Dikirim, $order->fresh()->warehouse_status);
 
         $this->assertSame(3, WarehouseProcessLog::where('order_id', $order->id)->count());
@@ -86,9 +89,8 @@ class WarehouseProcessingTest extends TestCase
         $order = Order::factory()->create(['warehouse_status' => WarehouseStatus::Dikirim]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->call('advance', $order->id)
+        $this->actingAs($user)
+            ->patch(route('admin.warehouse.advance', $order))
             ->assertForbidden();
     }
 
@@ -97,9 +99,8 @@ class WarehouseProcessingTest extends TestCase
         $order = Order::factory()->create(['warehouse_status' => WarehouseStatus::Diterima]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->call('markReceived', $order->id)
+        $this->actingAs($user)
+            ->patch(route('admin.warehouse.receive', $order))
             ->assertForbidden();
     }
 
@@ -109,9 +110,9 @@ class WarehouseProcessingTest extends TestCase
         Order::factory()->create(['shopee_order_sn' => 'SN-DIKIRIM', 'warehouse_status' => WarehouseStatus::Dikirim]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->set('status', WarehouseStatus::Diterima->value)
+        $this->actingAs($user)
+            ->get(route('admin.warehouse.index', ['status' => WarehouseStatus::Diterima->value]))
+            ->assertOk()
             ->assertSee('SN-DITERIMA')
             ->assertDontSee('SN-DIKIRIM');
     }
@@ -122,9 +123,9 @@ class WarehouseProcessingTest extends TestCase
         Order::factory()->create(['shopee_order_sn' => 'OTHERORDER99']);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->set('search', 'FINDME')
+        $this->actingAs($user)
+            ->get(route('admin.warehouse.index', ['search' => 'FINDME']))
+            ->assertOk()
             ->assertSee('FINDME12345')
             ->assertDontSee('OTHERORDER99');
     }
@@ -139,9 +140,9 @@ class WarehouseProcessingTest extends TestCase
 
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->set('search', 'RESIUNIK')
+        $this->actingAs($user)
+            ->get(route('admin.warehouse.index', ['search' => 'RESIUNIK']))
+            ->assertOk()
             ->assertSee('ORDER-A')
             ->assertDontSee('ORDER-B');
     }
@@ -158,9 +159,9 @@ class WarehouseProcessingTest extends TestCase
         ]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->set('month', '2026-09')
+        $this->actingAs($user)
+            ->get(route('admin.warehouse.index', ['month' => '2026-09']))
+            ->assertOk()
             ->assertSee('ORDER-SEPTEMBER')
             ->assertDontSee('ORDER-OCTOBER');
     }
@@ -181,10 +182,9 @@ class WarehouseProcessingTest extends TestCase
         ]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->set('dateFrom', '2026-09-08')
-            ->set('dateTo', '2026-09-15')
+        $this->actingAs($user)
+            ->get(route('admin.warehouse.index', ['date_from' => '2026-09-08', 'date_to' => '2026-09-15']))
+            ->assertOk()
             ->assertSee('ORDER-IN-RANGE')
             ->assertDontSee('ORDER-BEFORE-RANGE')
             ->assertDontSee('ORDER-AFTER-RANGE');
@@ -202,13 +202,17 @@ class WarehouseProcessingTest extends TestCase
         ]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        $component = Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->call('filterToday')
+        $this->actingAs($user)
+            ->get(route('admin.warehouse.index', [
+                'date_from' => now()->toDateString(),
+                'date_to' => now()->toDateString(),
+            ]))
+            ->assertOk()
             ->assertSee('ORDER-TODAY')
             ->assertDontSee('ORDER-LAST-MONTH');
 
-        $component->call('resetFilters')
+        $this->get(route('admin.warehouse.index'))
+            ->assertOk()
             ->assertSee('ORDER-TODAY')
             ->assertSee('ORDER-LAST-MONTH');
     }
@@ -225,10 +229,13 @@ class WarehouseProcessingTest extends TestCase
         ]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->set('selectedOrderIds', [(string) $order1->id, (string) $order2->id])
-            ->call('bulkUpdateStatus', 'dikemas');
+        $this->actingAs($user)
+            ->patch(route('admin.warehouse.bulk-update'), [
+                'selected_order_ids' => [$order1->id, $order2->id],
+                'target_status' => WarehouseStatus::Dikemas->value,
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
 
         $order1->refresh();
         $order2->refresh();
@@ -246,30 +253,29 @@ class WarehouseProcessingTest extends TestCase
         ]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->call('advance', $cancelledOrder->id)
+        $this->actingAs($user)
+            ->patch(route('admin.warehouse.advance', $cancelledOrder))
             ->assertForbidden();
 
         $cancelledOrder->refresh();
         $this->assertSame(WarehouseStatus::Diterima, $cancelledOrder->warehouse_status);
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->set('selectedOrderIds', [(string) $cancelledOrder->id])
-            ->call('bulkUpdateStatus', 'dikemas');
+        $this->patch(route('admin.warehouse.bulk-update'), [
+            'selected_order_ids' => [$cancelledOrder->id],
+            'target_status' => WarehouseStatus::Dikemas->value,
+        ])->assertRedirect();
 
         $cancelledOrder->refresh();
         $this->assertSame(WarehouseStatus::Diterima, $cancelledOrder->warehouse_status);
     }
 
-    public function test_can_open_and_close_packing_slip(): void
+    public function test_order_and_items_are_visible_on_warehouse_page(): void
     {
         $order = Order::factory()->create([
             'shopee_order_sn' => 'SN-SLIP-TEST',
             'buyer_username' => 'ibu_rahmawati',
         ]);
-        \App\Models\OrderItem::factory()->create([
+        OrderItem::factory()->create([
             'order_id' => $order->id,
             'item_name' => 'Beras Koshikari 5kg',
             'sku' => 'BS-KOSHI-5KG',
@@ -277,14 +283,11 @@ class WarehouseProcessingTest extends TestCase
         ]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($user)
-            ->test('pages::admin.warehouse.index')
-            ->call('openPackingSlip', $order->id)
-            ->assertSet('packingSlipOrderId', $order->id)
+        $this->actingAs($user)
+            ->get(route('admin.warehouse.index'))
+            ->assertOk()
             ->assertSee('SN-SLIP-TEST')
             ->assertSee('Beras Koshikari 5kg')
-            ->assertSee('BS-KOSHI-5KG')
-            ->call('closePackingSlip')
-            ->assertSet('packingSlipOrderId', null);
+            ->assertSee('BS-KOSHI-5KG');
     }
 }

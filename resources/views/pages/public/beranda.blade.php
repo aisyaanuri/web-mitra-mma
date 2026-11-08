@@ -1,61 +1,6 @@
-<?php
+@extends('layouts.public')
+@section('content')
 
-use App\Enums\ProductCategory;
-use App\Models\CompanyContent;
-use App\Models\Product;
-use App\Models\SiteSetting;
-use Artesaos\SEOTools\Facades\OpenGraph;
-use Artesaos\SEOTools\Facades\SEOMeta;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\Layout;
-use Livewire\Component;
-
-new #[Layout('layouts::public')] class extends Component
-{
-    public function mount(): void
-    {
-        SEOMeta::setTitle('Beranda');
-        SEOMeta::setDescription('Distributor resmi Yummy Bites dan beras premium di Sidoarjo, melayani 355+ outlet di Indonesia bagian timur.');
-        OpenGraph::setTitle('PT Mustika Makmur Abadi');
-        OpenGraph::setDescription('Distributor resmi Yummy Bites dan beras premium di Sidoarjo.');
-    }
-
-    #[Computed]
-    public function hero(): ?CompanyContent
-    {
-        return CompanyContent::section('beranda_hero');
-    }
-
-    #[Computed]
-    public function distribusi(): ?CompanyContent
-    {
-        return CompanyContent::section('beranda_distribusi');
-    }
-
-    #[Computed]
-    public function featuredProducts()
-    {
-        return Product::where('is_active', true)->where('is_featured', true)->with('images')->take(8)->get();
-    }
-
-    #[Computed]
-    public function distributionRegions(): array
-    {
-        return ['Jawa Timur', 'Sulawesi', 'Kalimantan', 'Timor Leste', 'Maluku', 'NTT', 'NTB', 'Bali'];
-    }
-
-    #[Computed]
-    public function yummyBitesCount(): int
-    {
-        return Product::where('is_active', true)->where('category', ProductCategory::YummyBites->value)->count();
-    }
-
-    #[Computed]
-    public function berasImporCount(): int
-    {
-        return Product::where('is_active', true)->where('category', ProductCategory::BerasImpor->value)->count();
-    }
-}; ?>
 
 <div>
     {{-- ============================================================
@@ -77,16 +22,16 @@ new #[Layout('layouts::public')] class extends Component
         <div class="relative z-10 mx-auto flex max-w-6xl flex-col justify-center px-4 py-20 sm:px-6 sm:py-28 lg:py-32">
             <div class="max-w-xl reveal">
                 <h1 class="heading-display font-display text-4xl font-extrabold text-white sm:text-5xl lg:text-6xl">
-                    {{ $this->hero?->title ?? 'Distributor Resmi Yummy Bites & Beras Premium' }}
+                    {{ $hero?->title ?? 'Distributor Resmi Yummy Bites & Beras Premium' }}
                 </h1>
                 <p class="mt-5 max-w-md text-lg leading-relaxed text-white/85">
-                    {{ $this->hero?->body ?? 'Menyuplai 355+ outlet di 8 wilayah Indonesia bagian timur, langsung dari gudang di Sidoarjo.' }}
+                    {{ $hero?->body ?? 'Menyuplai 355+ outlet di 8 wilayah Indonesia bagian timur, langsung dari gudang di Sidoarjo.' }}
                 </p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="{{ route('produk') }}" wire:navigate class="rounded-xl bg-sun-500 px-7 py-3.5 text-sm font-extrabold text-slate-900 shadow-lg shadow-sun-500/30 transition hover:bg-sun-400 hover:shadow-xl focus:ring-2 focus:ring-sun-300 focus:ring-offset-2 focus:ring-offset-brand-900 focus:outline-none">
+                    <a href="{{ route('produk') }}"  class="rounded-xl bg-sun-500 px-7 py-3.5 text-sm font-extrabold text-slate-900 shadow-lg shadow-sun-500/30 transition hover:bg-sun-400 hover:shadow-xl focus:ring-2 focus:ring-sun-300 focus:ring-offset-2 focus:ring-offset-brand-900 focus:outline-none">
                         Lihat Katalog Produk
                     </a>
-                    <a href="{{ route('kontak') }}" wire:navigate class="rounded-xl border-2 border-white/40 bg-white/10 px-7 py-3.5 text-sm font-extrabold text-white backdrop-blur-sm transition hover:border-white/70 hover:bg-white/20 focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-brand-900 focus:outline-none">
+                    <a href="{{ route('kontak') }}"  class="rounded-xl border-2 border-white/40 bg-white/10 px-7 py-3.5 text-sm font-extrabold text-white backdrop-blur-sm transition hover:border-white/70 hover:bg-white/20 focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-brand-900 focus:outline-none">
                         Ajukan Kerja Sama
                     </a>
                 </div>
@@ -95,11 +40,11 @@ new #[Layout('layouts::public')] class extends Component
             {{-- Floating stat badges — integrated into hero --}}
             <div class="mt-12 flex flex-wrap gap-3 reveal">
                 <div class="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-md">
-                    <p class="font-display text-2xl font-extrabold text-sun-400">{{ SiteSetting::get('established_year', '2019') }}</p>
+                    <p class="font-display text-2xl font-extrabold text-sun-400">{{ \App\Models\SiteSetting::get('established_year', '2019') }}</p>
                     <p class="text-xs font-semibold text-white/70">Tahun Berdiri</p>
                 </div>
                 <div class="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-md">
-                    <p class="font-display text-2xl font-extrabold text-sun-400">{{ SiteSetting::get('outlets_count', '355') }}+</p>
+                    <p class="font-display text-2xl font-extrabold text-sun-400">{{ \App\Models\SiteSetting::get('outlets_count', '355') }}+</p>
                     <p class="text-xs font-semibold text-white/70">Outlet Aktif</p>
                 </div>
                 <div class="rounded-xl bg-white/15 px-5 py-3 backdrop-blur-md">
@@ -128,10 +73,10 @@ new #[Layout('layouts::public')] class extends Component
                 <span class="inline-block w-fit rounded-lg bg-white/20 px-3.5 py-1 text-xs font-bold tracking-wide text-white border border-white/20">MPASI & Snack Bayi</span>
                 <h2 class="heading-display font-display mt-4 text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">Yummy Bites</h2>
                 <p class="mt-4 max-w-md text-base sm:text-lg leading-relaxed text-white/95">
-                    Camilan MPASI untuk si kecil usia 6 bulan+ hingga 1 tahun+. {{ $this->yummyBitesCount }} varian produk aktif. Distributor resmi langsung dari principal, bukan reseller.
+                    Camilan MPASI untuk si kecil usia 6 bulan+ hingga 1 tahun+. {{ $yummyBitesCount }} varian produk aktif. Distributor resmi langsung dari principal, bukan reseller.
                 </p>
                 <div class="mt-8">
-                    <a href="{{ route('produk', ['category' => 'yummy_bites']) }}" wire:navigate class="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-extrabold text-slate-900 shadow-lg shadow-black/10 transition hover:bg-amber-50 hover:shadow-xl focus:ring-2 focus:ring-white/50 focus:outline-none">
+                    <a href="{{ route('produk', ['category' => 'yummy_bites']) }}"  class="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-extrabold text-slate-900 shadow-lg shadow-black/10 transition hover:bg-amber-50 hover:shadow-xl focus:ring-2 focus:ring-white/50 focus:outline-none">
                         Lihat Produk Yummy Bites
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" /></svg>
                     </a>
@@ -150,10 +95,10 @@ new #[Layout('layouts::public')] class extends Component
                 <span class="inline-block w-fit rounded-lg bg-white/15 px-3.5 py-1 text-xs font-bold tracking-wide text-white border border-white/20">Beras Premium & Lokal</span>
                 <h2 class="heading-display font-display mt-4 text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl">Beras Premium</h2>
                 <p class="mt-4 max-w-md text-base sm:text-lg leading-relaxed text-white/95">
-                    Beras pilihan berkualitas: Beras Jepang, Basmati, Jasmin, Organik, Lokal, dan Lautan Mas. {{ $this->berasImporCount }} produk aktif, untuk kebutuhan rumah tangga, restoran, dan hotel.
+                    Beras pilihan berkualitas: Beras Jepang, Basmati, Jasmin, Organik, Lokal, dan Lautan Mas. {{ $berasImporCount }} produk aktif, untuk kebutuhan rumah tangga, restoran, dan hotel.
                 </p>
                 <div class="mt-8">
-                    <a href="{{ route('produk', ['category' => 'beras_impor']) }}" wire:navigate class="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-extrabold text-brand-900 shadow-lg shadow-black/10 transition hover:bg-slate-50 hover:shadow-xl focus:ring-2 focus:ring-white/50 focus:outline-none">
+                    <a href="{{ route('produk', ['category' => 'beras_impor']) }}"  class="inline-flex items-center gap-2 rounded-xl bg-white px-7 py-3.5 text-sm font-extrabold text-brand-900 shadow-lg shadow-black/10 transition hover:bg-slate-50 hover:shadow-xl focus:ring-2 focus:ring-white/50 focus:outline-none">
                         Lihat Produk Beras
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7" /></svg>
                     </a>
@@ -186,10 +131,10 @@ new #[Layout('layouts::public')] class extends Component
                     Sistem Rantai Pasok & Distribusi
                 </span>
                 <h2 class="heading-display font-display mt-4 text-3xl font-extrabold text-slate-900 sm:text-4xl lg:text-5xl dark:text-white">
-                    {{ $this->distribusi?->title ?? 'Sarana & Jangkauan Distribusi' }}
+                    {{ $distribusi?->title ?? 'Sarana & Jangkauan Distribusi' }}
                 </h2>
                 <p class="mt-4 text-base sm:text-lg leading-relaxed text-slate-600 dark:text-zinc-300">
-                    {{ $this->distribusi?->body ?? 'Kami memiliki armada pengiriman sendiri (1 truk box besar dan 1 truk box kecil) yang melayani pengiriman gratis ongkir untuk wilayah Surabaya, Sidoarjo, Gresik, Malang, dan Mojokerto, Senin–Sabtu. Untuk wilayah di luar area tersebut, pengiriman dilakukan melalui ekspedisi rekanan.' }}
+                    {{ $distribusi?->body ?? 'Kami memiliki armada pengiriman sendiri (1 truk box besar dan 1 truk box kecil) yang melayani pengiriman gratis ongkir untuk wilayah Surabaya, Sidoarjo, Gresik, Malang, dan Mojokerto, Senin–Sabtu. Untuk wilayah di luar area tersebut, pengiriman dilakukan melalui ekspedisi rekanan.' }}
                 </p>
             </div>
 
@@ -230,7 +175,7 @@ new #[Layout('layouts::public')] class extends Component
                     </div>
                     <div class="mt-6 border-t border-slate-100 pt-4 dark:border-zinc-700/60">
                         <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                            {{ SiteSetting::get('distribution_free_area', 'Surabaya, Sidoarjo, Gresik, Malang, Mojokerto') }}
+                            {{ \App\Models\SiteSetting::get('distribution_free_area', 'Surabaya, Sidoarjo, Gresik, Malang, Mojokerto') }}
                         </p>
                     </div>
                 </div>
@@ -270,7 +215,7 @@ new #[Layout('layouts::public')] class extends Component
                 </div>
 
                 <div class="mt-6 flex flex-wrap gap-2.5">
-                    @foreach ($this->distributionRegions as $region)
+                    @foreach ($distributionRegions as $region)
                         <div class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-2xs transition hover:border-blue-400 hover:bg-blue-50/60 hover:text-blue-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700">
                             <svg class="h-3.5 w-3.5 text-blue-600 shrink-0 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
                             <span>{{ $region }}</span>
@@ -432,7 +377,7 @@ new #[Layout('layouts::public')] class extends Component
     {{-- ============================================================
          SECTION 5: PRODUK UNGGULAN — Gradient sky background + carousel
          ============================================================ --}}
-    @if ($this->featuredProducts->count() > 0)
+    @if ($featuredProducts->count() > 0)
         <section class="bg-gradient-sky py-16 sm:py-20 dark:bg-zinc-900">
             <div class="mx-auto max-w-6xl px-4 sm:px-6">
                 <div class="flex flex-wrap items-end justify-between gap-4 reveal">
@@ -440,7 +385,7 @@ new #[Layout('layouts::public')] class extends Component
                         <h2 class="heading-display font-display text-3xl font-extrabold text-slate-900 sm:text-4xl dark:text-white">Produk Unggulan</h2>
                         <p class="mt-2 text-slate-600 dark:text-zinc-400">Pilihan terbaik dari katalog kami</p>
                     </div>
-                    <a href="{{ route('produk') }}" wire:navigate class="text-sm font-extrabold text-brand-600 hover:text-brand-700 dark:text-brand-400">
+                    <a href="{{ route('produk') }}"  class="text-sm font-extrabold text-brand-600 hover:text-brand-700 dark:text-brand-400">
                         Lihat Semua →
                     </a>
                 </div>
@@ -459,11 +404,11 @@ new #[Layout('layouts::public')] class extends Component
                     })
                 ">
                     <div class="swiper-wrapper">
-                        @foreach ($this->featuredProducts as $product)
+                        @foreach ($featuredProducts as $product)
                             <div class="swiper-slide">
                                 <a
                                     href="{{ route('produk.detail', $product) }}"
-                                    wire:navigate
+
                                     class="group block overflow-hidden rounded-2xl bg-white shadow-md shadow-slate-200/50 transition duration-200 hover:-translate-y-1 hover:shadow-xl dark:bg-zinc-800 dark:shadow-none"
                                 >
                                     <div class="flex aspect-square items-center justify-center bg-slate-50 p-4 dark:bg-zinc-700/50">
@@ -508,16 +453,18 @@ new #[Layout('layouts::public')] class extends Component
             <h2 class="heading-display font-display text-3xl font-extrabold text-slate-900 sm:text-4xl lg:text-5xl">Tertarik Menjadi Mitra Kami?</h2>
             <p class="mx-auto mt-4 max-w-lg text-lg text-slate-800/80">Hubungi kami untuk informasi kerja sama distribusi Yummy Bites dan beras premium di wilayah Anda.</p>
             <div class="mt-10 flex flex-wrap justify-center gap-4">
-                @if ($whatsapp = SiteSetting::get('whatsapp_number'))
+                @if ($whatsapp = \App\Models\SiteSetting::get('whatsapp_number'))
                     <a href="https://wa.me/{{ $whatsapp }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2.5 rounded-xl bg-slate-900 px-8 py-4 text-sm font-extrabold text-white shadow-xl transition hover:bg-slate-800 focus:ring-2 focus:ring-slate-700 focus:ring-offset-2 focus:ring-offset-sun-500 focus:outline-none">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5"><path d="M12.04 2c-5.46 0-9.9 4.44-9.9 9.9 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.44 9.9-9.9 0-2.64-1.03-5.12-2.9-6.99A9.82 9.82 0 0 0 12.04 2zm5.8 14.07c-.24.68-1.4 1.3-1.93 1.36-.5.06-1 .27-3.36-.7-2.84-1.17-4.66-4.05-4.8-4.24-.14-.19-1.15-1.53-1.15-2.92s.72-2.06.98-2.35c.26-.29.56-.36.75-.36h.54c.17 0 .4-.03.62.48.24.56.8 1.95.87 2.09.07.14.11.3.02.49-.09.19-.14.3-.28.46-.14.16-.29.36-.42.48-.14.13-.29.28-.12.55.17.28.75 1.24 1.61 2.01 1.11 1 2.04 1.31 2.32 1.46.28.14.44.12.6-.07.17-.19.72-.84.91-1.13.19-.28.38-.23.63-.14.26.09 1.65.78 1.93.92.28.14.47.21.54.33.07.12.07.68-.17 1.36z"/></svg>
                         Hubungi via WhatsApp
                     </a>
                 @endif
-                <a href="{{ route('kontak') }}" wire:navigate class="rounded-xl bg-white px-8 py-4 text-sm font-extrabold text-slate-900 shadow-xl transition hover:bg-slate-50 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-sun-500 focus:outline-none">
+                <a href="{{ route('kontak') }}"  class="rounded-xl bg-white px-8 py-4 text-sm font-extrabold text-slate-900 shadow-xl transition hover:bg-slate-50 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-sun-500 focus:outline-none">
                     Kirim Pesan
                 </a>
             </div>
         </div>
     </section>
 </div>
+
+@endsection

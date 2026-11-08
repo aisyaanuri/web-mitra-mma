@@ -7,7 +7,6 @@ use App\Models\Order;
 use App\Models\OrderReturn;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class OrderReturnsPageTest extends TestCase
@@ -49,9 +48,9 @@ class OrderReturnsPageTest extends TestCase
 
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.returns.index')
-            ->set('search', 'SPECIAL')
+        $this->actingAs($owner)
+            ->get(route('admin.returns.index', ['search' => 'SPECIAL']))
+            ->assertOk()
             ->assertSee('RET-SPECIAL-111')
             ->assertDontSee('RET-OTHER-999');
     }
@@ -66,13 +65,13 @@ class OrderReturnsPageTest extends TestCase
 
         $gudang = User::factory()->role(UserRole::AdminGudang)->create();
 
-        Livewire::actingAs($gudang)
-            ->test('pages::admin.returns.index')
-            ->call('openVerifyModal', $return->id)
-            ->set('verifyPhysicalStatus', 'diterima_rusak')
-            ->set('verifyPhysicalNote', 'Segel terbuka dan beras kemasan 5kg bocor.')
-            ->call('saveVerification')
-            ->assertHasNoErrors();
+        $this->actingAs($gudang)
+            ->patch(route('admin.returns.verify', $return), [
+                'physical_status' => 'diterima_rusak',
+                'physical_note' => 'Segel terbuka dan beras kemasan 5kg bocor.',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
 
         $return->refresh();
 

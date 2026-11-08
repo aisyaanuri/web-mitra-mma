@@ -4,8 +4,8 @@ namespace Tests\Feature\Public;
 
 use App\Enums\ProductCategory;
 use App\Models\Product;
+use Database\Seeders\ProductSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class ProdukPageTest extends TestCase
@@ -28,8 +28,8 @@ class ProdukPageTest extends TestCase
         Product::factory()->create(['name' => 'Snack Bayi A', 'category' => ProductCategory::YummyBites, 'is_active' => true]);
         Product::factory()->create(['name' => 'Beras Jepang A', 'category' => ProductCategory::BerasImpor, 'country_of_origin' => 'Jepang', 'is_active' => true]);
 
-        Livewire::test('pages::public.produk')
-            ->set('category', ProductCategory::YummyBites->value)
+        $this->get(route('produk', ['category' => ProductCategory::YummyBites->value]))
+            ->assertOk()
             ->assertSee('Snack Bayi A')
             ->assertDontSee('Beras Jepang A');
     }
@@ -39,16 +39,18 @@ class ProdukPageTest extends TestCase
         Product::factory()->create(['name' => 'Beras Jepang', 'category' => ProductCategory::BerasImpor, 'country_of_origin' => 'Jepang', 'is_active' => true]);
         Product::factory()->create(['name' => 'Beras Vietnam', 'category' => ProductCategory::BerasImpor, 'country_of_origin' => 'Vietnam', 'is_active' => true]);
 
-        Livewire::test('pages::public.produk')
-            ->set('category', ProductCategory::BerasImpor->value)
-            ->set('country', 'Jepang')
+        $this->get(route('produk', [
+            'category' => ProductCategory::BerasImpor->value,
+            'country' => 'Jepang',
+        ]))
+            ->assertOk()
             ->assertSee('Beras Jepang')
             ->assertDontSee('Beras Vietnam');
     }
 
     public function test_product_seeder_creates_all_rice_products_with_images(): void
     {
-        $this->seed(\Database\Seeders\ProductSeeder::class);
+        $this->seed(ProductSeeder::class);
 
         $expectedRiceNames = [
             'Koshikari 5 Kg',
@@ -81,13 +83,13 @@ class ProdukPageTest extends TestCase
         Product::factory()->create(['name' => 'Yummy Bites BebeRoll Cheese', 'is_active' => true]);
         Product::factory()->create(['name' => 'Beras Koshihikari 5kg', 'is_active' => true]);
 
-        Livewire::test('pages::public.produk')
-            ->set('search', 'BebeRoll')
+        $this->get(route('produk', ['search' => 'BebeRoll']))
+            ->assertOk()
             ->assertSee('Yummy Bites BebeRoll Cheese')
             ->assertDontSee('Beras Koshihikari 5kg');
     }
 
-    public function test_can_open_and_close_quick_detail_modal(): void
+    public function test_product_card_links_to_product_detail_page(): void
     {
         $product = Product::factory()->create([
             'name' => 'Yummy Bites BebeRoll Cheese',
@@ -95,13 +97,9 @@ class ProdukPageTest extends TestCase
             'is_active' => true,
         ]);
 
-        Livewire::test('pages::public.produk')
-            ->assertSet('selectedProductId', null)
-            ->call('openDetail', $product->id)
-            ->assertSet('selectedProductId', $product->id)
-            ->assertSee('Spesifikasi dan Keunggulan')
-            ->call('closeDetail')
-            ->assertSet('selectedProductId', null);
+        $this->get(route('produk'))
+            ->assertOk()
+            ->assertSee(route('produk.detail', $product), false);
     }
 
     public function test_product_detail_page_renders_successfully(): void

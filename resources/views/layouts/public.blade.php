@@ -38,7 +38,7 @@
         >
             <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
                 {{-- Official Logo: image + text --}}
-                <a href="{{ route('home') }}" wire:navigate class="flex items-center gap-2.5">
+                <a href="{{ route('home') }}" class="flex items-center gap-2.5">
                     <img
                         src="{{ asset('images/logo-mustika-square.webp') }}"
                         alt="Logo PT Mustika Makmur Abadi"
@@ -54,7 +54,6 @@
                     @foreach ($navLinks as $routeName => $label)
                         <a
                             href="{{ route($routeName) }}"
-                            wire:navigate
                             class="rounded-lg px-3.5 py-2 text-sm font-medium transition {{ request()->routeIs($routeName) ? 'text-brand-600 dark:text-brand-300' : 'text-slate-600 hover:text-brand-600 dark:text-zinc-300 dark:hover:text-brand-300' }}"
                         >
                             {{ $label }}
@@ -75,7 +74,7 @@
                         </a>
                     @endif
 
-                    <a href="{{ route('login') }}" wire:navigate class="hidden text-sm font-medium text-slate-500 transition hover:text-brand-600 md:inline-block dark:text-zinc-400">
+                    <a href="{{ route('login') }}" class="hidden text-sm font-medium text-slate-500 transition hover:text-brand-600 md:inline-block dark:text-zinc-400">
                         Login Staf
                     </a>
 
@@ -102,13 +101,12 @@
                     @foreach ($navLinks as $routeName => $label)
                         <a
                             href="{{ route($routeName) }}"
-                            wire:navigate
                             class="rounded-lg px-3 py-2.5 text-sm font-medium {{ request()->routeIs($routeName) ? 'bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300' : 'text-slate-700 dark:text-zinc-300' }}"
                         >
                             {{ $label }}
                         </a>
                     @endforeach
-                    <a href="{{ route('login') }}" wire:navigate class="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 dark:text-zinc-300">
+                    <a href="{{ route('login') }}" class="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 dark:text-zinc-300">
                         Login Staf
                     </a>
                     @if ($whatsapp)
@@ -121,7 +119,7 @@
         </header>
 
         <main class="flex-1">
-            {{ $slot }}
+            @yield('content')
         </main>
 
         {{-- Footer: 2-column layout based on actual content (R-05). Dark
@@ -149,16 +147,16 @@
                         <div>
                             <p class="text-sm font-bold text-white">Navigasi</p>
                             <ul class="mt-3 space-y-2 text-sm text-brand-200">
-                                <li><a href="{{ route('home') }}" wire:navigate class="transition hover:text-white">Beranda</a></li>
-                                <li><a href="{{ route('produk') }}" wire:navigate class="transition hover:text-white">Produk</a></li>
-                                <li><a href="{{ route('tentang-kami') }}" wire:navigate class="transition hover:text-white">Tentang Kami</a></li>
-                                <li><a href="{{ route('kontak') }}" wire:navigate class="transition hover:text-white">Kontak</a></li>
+                                <li><a href="{{ route('home') }}" class="transition hover:text-white">Beranda</a></li>
+                                <li><a href="{{ route('produk') }}" class="transition hover:text-white">Produk</a></li>
+                                <li><a href="{{ route('tentang-kami') }}" class="transition hover:text-white">Tentang Kami</a></li>
+                                <li><a href="{{ route('kontak') }}" class="transition hover:text-white">Kontak</a></li>
                             </ul>
                         </div>
                         <div>
                             <p class="text-sm font-bold text-white">Lainnya</p>
                             <ul class="mt-3 space-y-2 text-sm text-brand-200">
-                                <li><a href="{{ route('kebijakan-privasi') }}" wire:navigate class="transition hover:text-white">Kebijakan Privasi</a></li>
+                                <li><a href="{{ route('kebijakan-privasi') }}" class="transition hover:text-white">Kebijakan Privasi</a></li>
                                 @if ($whatsapp)
                                     <li><a href="https://wa.me/{{ $whatsapp }}" target="_blank" rel="noopener" class="transition hover:text-white">WhatsApp</a></li>
                                 @endif

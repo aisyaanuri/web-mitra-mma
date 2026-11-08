@@ -7,7 +7,6 @@ use App\Enums\WarehouseStatus;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class DashboardTest extends TestCase
@@ -33,12 +32,15 @@ class DashboardTest extends TestCase
 
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        $component = Livewire::actingAs($owner)->test('pages::dashboard');
-
-        $this->assertSame(3, $component->get('totalOrders'));
-        $this->assertSame(1, $component->get('warehouseBreakdown')[WarehouseStatus::Diterima->value]);
-        $this->assertSame(1, $component->get('warehouseBreakdown')[WarehouseStatus::Dikirim->value]);
-        $this->assertSame(1, $component->get('warehouseBreakdown')['belum_diproses']);
+        $this->actingAs($owner)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertViewHas('totalOrders', 3)
+            ->assertViewHas('warehouseBreakdown', fn (array $breakdown) => (
+                $breakdown[WarehouseStatus::Diterima->value] === 1
+                && $breakdown[WarehouseStatus::Dikirim->value] === 1
+                && $breakdown['belum_diproses'] === 1
+            ));
     }
 
     public function test_admin_gudang_does_not_see_sales_chart_or_reconciliation(): void

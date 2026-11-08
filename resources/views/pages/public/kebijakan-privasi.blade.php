@@ -1,17 +1,6 @@
-<?php
+@extends('layouts.public')
+@section('content')
 
-use Artesaos\SEOTools\Facades\SEOMeta;
-use Livewire\Attributes\Layout;
-use Livewire\Component;
-
-new #[Layout('layouts::public')] class extends Component
-{
-    public function mount(): void
-    {
-        SEOMeta::setTitle('Kebijakan Privasi');
-        SEOMeta::setDescription('Kebijakan privasi PT Mustika Makmur Abadi mengenai data yang dikumpulkan melalui website ini.');
-    }
-}; ?>
 
 <div class="mx-auto max-w-3xl px-4 py-16 sm:px-6">
     <h1 class="font-display text-3xl font-bold text-slate-900 dark:text-white">Kebijakan Privasi</h1>
@@ -60,7 +49,7 @@ new #[Layout('layouts::public')] class extends Component
                 Anda berhak meminta akses, koreksi, atau penghapusan data pribadi yang telah Anda kirimkan kepada
                 kami melalui formulir kontak, sesuai dengan Undang-Undang No. 27 Tahun 2022 tentang Pelindungan
                 Data Pribadi. Untuk mengajukan permintaan ini, silakan hubungi kami melalui halaman
-                <a href="{{ route('kontak') }}" wire:navigate class="font-medium text-brand-600 hover:text-brand-700">Kontak</a>.
+                <a href="{{ route('kontak') }}"  class="font-medium text-brand-600 hover:text-brand-700">Kontak</a>.
             </p>
         </section>
 
@@ -73,3 +62,5 @@ new #[Layout('layouts::public')] class extends Component
         </section>
     </div>
 </div>
+
+@endsection

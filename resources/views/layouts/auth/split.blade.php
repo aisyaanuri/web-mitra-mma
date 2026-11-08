@@ -9,7 +9,6 @@
             <div class="mx-auto w-full max-w-4xl xl:max-w-5xl flex items-center justify-between pb-3 sm:pb-4">
                 <a
                     href="{{ route('home') }}"
-                    wire:navigate
                     class="group inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md transition hover:bg-white/25 hover:text-white shadow-xs"
                 >
                     <svg class="h-3.5 w-3.5 transition group-hover:-translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -68,11 +67,9 @@
             </div>
         </div>
 
-        @persist('toast')
-            <flux:toast.group>
-                <flux:toast />
-            </flux:toast.group>
-        @endpersist
+        <flux:toast.group>
+            <flux:toast />
+        </flux:toast.group>
 
         @fluxScripts
     </body>

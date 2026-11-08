@@ -10,44 +10,44 @@
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         <flux:sidebar sticky collapsible="mobile" class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.header>
-                <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" wire:navigate />
+                <x-app-logo :sidebar="true" href="{{ route('dashboard') }}" />
                 <flux:sidebar.collapse class="lg:hidden" />
             </flux:sidebar.header>
 
             <flux:sidebar.nav>
                 <flux:sidebar.group :heading="__('Platform')" class="grid">
-                    <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>
+                    <flux:sidebar.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </flux:sidebar.item>
 
                     @if (auth()->user()->hasRole(\App\Enums\UserRole::Owner, \App\Enums\UserRole::AdminMarketplace))
-                        <flux:sidebar.item icon="layout-grid" :href="route('admin.products.index')" :current="request()->routeIs('admin.products.*')" wire:navigate>
+                        <flux:sidebar.item icon="layout-grid" :href="route('admin.products.index')" :current="request()->routeIs('admin.products.*')">
                             {{ __('Produk') }}
                         </flux:sidebar.item>
                     @endif
 
                     @if (auth()->user()->hasRole(\App\Enums\UserRole::Owner, \App\Enums\UserRole::AdminGudang))
-                        <flux:sidebar.item icon="truck" :href="route('admin.warehouse.index')" :current="request()->routeIs('admin.warehouse.*')" wire:navigate>
+                        <flux:sidebar.item icon="truck" :href="route('admin.warehouse.index')" :current="request()->routeIs('admin.warehouse.*')">
                             {{ __('Gudang') }}
                         </flux:sidebar.item>
                     @endif
 
                     @if (auth()->user()->hasRole(\App\Enums\UserRole::Owner, \App\Enums\UserRole::AdminMarketplace))
-                        <flux:sidebar.item icon="chevrons-up-down" :href="route('admin.reconciliation.index')" :current="request()->routeIs('admin.reconciliation.*')" wire:navigate>
+                        <flux:sidebar.item icon="chevrons-up-down" :href="route('admin.reconciliation.index')" :current="request()->routeIs('admin.reconciliation.*')">
                             {{ __('Rekonsiliasi') }}
                         </flux:sidebar.item>
 
-                        <flux:sidebar.item icon="folder-git-2" :href="route('admin.sync.index')" :current="request()->routeIs('admin.sync.*')" wire:navigate>
+                        <flux:sidebar.item icon="folder-git-2" :href="route('admin.sync.index')" :current="request()->routeIs('admin.sync.*')">
                             {{ __('Sinkronisasi') }}
                         </flux:sidebar.item>
                     @endif
 
-                    <flux:sidebar.item icon="arrow-path" :href="route('admin.returns.index')" :current="request()->routeIs('admin.returns.*')" wire:navigate>
+                    <flux:sidebar.item icon="arrow-path" :href="route('admin.returns.index')" :current="request()->routeIs('admin.returns.*')">
                         {{ __('Retur') }}
                     </flux:sidebar.item>
 
                     @if (auth()->user()->hasRole(\App\Enums\UserRole::Owner, \App\Enums\UserRole::AdminMarketplace))
-                        <flux:sidebar.item icon="envelope" :href="route('admin.messages.index')" :current="request()->routeIs('admin.messages.*')" wire:navigate>
+                        <flux:sidebar.item icon="envelope" :href="route('admin.messages.index')" :current="request()->routeIs('admin.messages.*')">
                             {{ __('Pesan Kontak') }}
                             @php
                                 $newContactCount = \App\Models\ContactMessage::where('status', \App\Enums\ContactMessageStatus::New)->count();
@@ -59,7 +59,7 @@
                     @endif
 
                     @if (auth()->user()->isOwner())
-                        <flux:sidebar.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')" wire:navigate>
+                        <flux:sidebar.item icon="users" :href="route('admin.users.index')" :current="request()->routeIs('admin.users.*')">
                             {{ __('Pengguna') }}
                         </flux:sidebar.item>
                     @endif
@@ -69,11 +69,11 @@
             <flux:spacer />
 
             <flux:sidebar.nav>
-                <flux:sidebar.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
+                <flux:sidebar.item icon="folder-git-2" href="https://github.com/aisyaanuri/web-mitra-mma" target="_blank">
                     {{ __('Repository') }}
                 </flux:sidebar.item>
 
-                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
+                <flux:sidebar.item icon="book-open-text" href="https://laravel.com/docs" target="_blank">
                     {{ __('Documentation') }}
                 </flux:sidebar.item>
             </flux:sidebar.nav>
@@ -113,7 +113,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>
+                        <flux:menu.item :href="route('profile.edit')" icon="cog">
                             {{ __('Settings') }}
                         </flux:menu.item>
                     </flux:menu.radio.group>
@@ -138,11 +138,9 @@
 
         {{ $slot }}
 
-        @persist('toast')
-            <flux:toast.group>
-                <flux:toast />
-            </flux:toast.group>
-        @endpersist
+        <flux:toast.group>
+            <flux:toast />
+        </flux:toast.group>
 
         @fluxScripts
     </body>

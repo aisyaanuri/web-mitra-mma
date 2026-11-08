@@ -4,7 +4,6 @@ namespace Tests\Feature\Settings;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class ProfileUpdateTest extends TestCase
@@ -24,12 +23,11 @@ class ProfileUpdateTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = Livewire::test('pages::settings.profile')
-            ->set('name', 'Test User')
-            ->set('email', 'test@example.com')
-            ->call('updateProfileInformation');
-
-        $response->assertHasNoErrors();
+        $this->patch(route('profile.update'), [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ])->assertRedirect()
+            ->assertSessionHasNoErrors();
 
         $user->refresh();
 
@@ -44,12 +42,11 @@ class ProfileUpdateTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = Livewire::test('pages::settings.profile')
-            ->set('name', 'Test User')
-            ->set('email', $user->email)
-            ->call('updateProfileInformation');
-
-        $response->assertHasNoErrors();
+        $this->patch(route('profile.update'), [
+            'name' => 'Test User',
+            'email' => $user->email,
+        ])->assertRedirect()
+            ->assertSessionHasNoErrors();
 
         $this->assertNotNull($user->refresh()->email_verified_at);
     }
@@ -60,13 +57,9 @@ class ProfileUpdateTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = Livewire::test('pages::settings.delete-user-modal')
-            ->set('password', 'password')
-            ->call('deleteUser');
-
-        $response
-            ->assertHasNoErrors()
-            ->assertRedirect('/');
+        $this->delete(route('profile.destroy'), ['password' => 'password'])
+            ->assertRedirect(route('home'))
+            ->assertSessionHasNoErrors();
 
         $this->assertNull($user->fresh());
         $this->assertFalse(auth()->check());
@@ -78,11 +71,10 @@ class ProfileUpdateTest extends TestCase
 
         $this->actingAs($user);
 
-        $response = Livewire::test('pages::settings.delete-user-modal')
-            ->set('password', 'wrong-password')
-            ->call('deleteUser');
-
-        $response->assertHasErrors(['password']);
+        $this->from(route('profile.edit'))
+            ->delete(route('profile.destroy'), ['password' => 'wrong-password'])
+            ->assertRedirect(route('profile.edit'))
+            ->assertSessionHasErrors(['password']);
 
         $this->assertNotNull($user->fresh());
     }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\UserRole;
+use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -22,20 +23,20 @@ use Spatie\Activitylog\Support\LogOptions;
  * @property int $id
  * @property string $name
  * @property string $email
- * @property Carbon|null $email_verified_at
+ * @property CarbonInterface|Carbon|null $email_verified_at
  * @property string $password
  * @property UserRole $role
  * @property bool $is_active
  * @property int $failed_login_attempts
- * @property Carbon|null $locked_until
- * @property Carbon|null $last_login_at
+ * @property CarbonInterface|Carbon|null $locked_until
+ * @property CarbonInterface|Carbon|null $last_login_at
  * @property string|null $last_login_ip
  * @property string|null $two_factor_secret
  * @property string|null $two_factor_recovery_codes
- * @property Carbon|null $two_factor_confirmed_at
+ * @property CarbonInterface|Carbon|null $two_factor_confirmed_at
  * @property string|null $remember_token
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|Carbon|null $created_at
+ * @property CarbonInterface|Carbon|null $updated_at
  */
 #[Fillable(['name', 'email', 'password', 'role', 'is_active'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]

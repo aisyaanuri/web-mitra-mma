@@ -1,6 +1,4 @@
-@assets
 @vite('resources/js/passkeys.js')
-@endassets
 
 <div
     x-data="{
@@ -49,7 +47,7 @@
                 await window.Passkeys.register({ name: this.name });
                 this.name = '';
                 this.showForm = false;
-                await $wire.loadPasskeys();
+                window.location.reload();
             } catch (e) {
                 if (e.constructor?.name !== 'UserCancelledError') {
                     this.error = e.message;

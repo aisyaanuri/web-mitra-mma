@@ -1,15 +1,19 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PublicSiteController;
+use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 
-Route::livewire('/', 'pages::public.beranda')->name('home');
-Route::livewire('/produk', 'pages::public.produk')->name('produk');
-Route::livewire('/produk/{product:slug}', 'pages::public.produk-detail')->name('produk.detail');
-Route::livewire('/tentang-kami', 'pages::public.tentang-kami')->name('tentang-kami');
-Route::livewire('/kontak', 'pages::public.kontak')->name('kontak');
-Route::livewire('/kebijakan-privasi', 'pages::public.kebijakan-privasi')->name('kebijakan-privasi');
+Route::get('/', [PublicSiteController::class, 'home'])->name('home');
+Route::get('/produk', [PublicSiteController::class, 'products'])->name('produk');
+Route::get('/produk/{product:slug}', [PublicSiteController::class, 'product'])->name('produk.detail');
+Route::get('/tentang-kami', [PublicSiteController::class, 'about'])->name('tentang-kami');
+Route::get('/kontak', [PublicSiteController::class, 'contact'])->name('kontak');
+Route::post('/kontak', [PublicSiteController::class, 'submitContact'])->name('kontak.store');
+Route::get('/kebijakan-privasi', [PublicSiteController::class, 'privacy'])->name('kebijakan-privasi');
 
 Route::get('/sitemap.xml', function () {
     $sitemap = Sitemap::create()
@@ -19,7 +23,7 @@ Route::get('/sitemap.xml', function () {
         ->add(Url::create(route('kontak'))->setPriority(0.8))
         ->add(Url::create(route('kebijakan-privasi'))->setPriority(0.3));
 
-    foreach (\App\Models\Product::where('is_active', true)->cursor() as $product) {
+    foreach (Product::where('is_active', true)->cursor() as $product) {
         $sitemap->add(Url::create(route('produk.detail', $product))->setPriority(0.7));
     }
 
@@ -29,7 +33,7 @@ Route::get('/sitemap.xml', function () {
 require __DIR__.'/admin.php';
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::livewire('dashboard', 'pages::dashboard')->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 });
 
 require __DIR__.'/settings.php';

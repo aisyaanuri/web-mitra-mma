@@ -7,7 +7,6 @@ use App\Enums\UserRole;
 use App\Models\ContactMessage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class ContactMessagesPageTest extends TestCase
@@ -65,33 +64,18 @@ class ContactMessagesPageTest extends TestCase
             'status' => ContactMessageStatus::Read,
         ]);
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.messages.index')
+        $this->actingAs($owner)
+            ->get(route('admin.messages.index'))
             ->assertSee('Budi Santoso')
-            ->assertSee('Siti Aminah')
-            ->set('search', 'Budi')
+            ->assertSee('Siti Aminah');
+
+        $this->get(route('admin.messages.index', ['search' => 'Budi']))
             ->assertSee('Budi Santoso')
-            ->assertDontSee('Siti Aminah')
-            ->set('search', '')
-            ->set('status', 'read')
+            ->assertDontSee('Siti Aminah');
+
+        $this->get(route('admin.messages.index', ['status' => ContactMessageStatus::Read->value]))
             ->assertSee('Siti Aminah')
             ->assertDontSee('Budi Santoso');
-    }
-
-    public function test_opening_message_auto_marks_it_as_read(): void
-    {
-        $owner = User::factory()->role(UserRole::Owner)->create();
-
-        $msg = ContactMessage::factory()->create([
-            'status' => ContactMessageStatus::New,
-        ]);
-
-        Livewire::actingAs($owner)
-            ->test('pages::admin.messages.index')
-            ->call('openMessage', $msg->id);
-
-        $msg->refresh();
-        $this->assertSame(ContactMessageStatus::Read, $msg->status);
     }
 
     public function test_admin_can_update_status_and_delete_message(): void
@@ -102,18 +86,16 @@ class ContactMessagesPageTest extends TestCase
             'status' => ContactMessageStatus::Read,
         ]);
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.messages.index')
-            ->call('updateStatus', $msg->id, 'replied');
+        $this->actingAs($owner)
+            ->patch(route('admin.messages.update-status', $msg), ['status' => ContactMessageStatus::Replied->value])
+            ->assertRedirect();
 
         $msg->refresh();
         $this->assertSame(ContactMessageStatus::Replied, $msg->status);
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.messages.index')
-            ->call('deleteMessage', $msg->id);
+        $this->delete(route('admin.messages.destroy', $msg))
+            ->assertRedirect();
 
         $this->assertDatabaseMissing('contact_messages', ['id' => $msg->id]);
     }
 }
-

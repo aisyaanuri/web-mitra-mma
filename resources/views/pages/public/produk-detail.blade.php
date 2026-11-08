@@ -1,80 +1,17 @@
-<?php
+@extends('layouts.public')
+@section('content')
 
-use App\Enums\ProductCategory;
-use App\Models\Product;
-use App\Models\SiteSetting;
-use Artesaos\SEOTools\Facades\SEOMeta;
-use Artesaos\SEOTools\Facades\OpenGraph;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\Layout;
-use Livewire\Component;
-
-new #[Layout('layouts::public')] class extends Component
-{
-    public Product $product;
-
-    public function mount(Product $product): void
-    {
-        abort_unless($product->is_active, 404);
-
-        $this->product = $product->load('images');
-
-        $title = $product->name . ' | PT Mustika Makmur Abadi';
-        $desc = mb_substr(str_replace("\n", ' ', $product->description ?? 'Katalog produk resmi PT Mustika Makmur Abadi'), 0, 160);
-
-        SEOMeta::setTitle($title);
-        SEOMeta::setDescription($desc);
-        SEOMeta::setCanonical(route('produk.detail', $product));
-
-        OpenGraph::setTitle($title);
-        OpenGraph::setDescription($desc);
-        OpenGraph::setUrl(route('produk.detail', $product));
-        OpenGraph::addProperty('type', 'product');
-
-        if ($firstImage = $product->images->first()) {
-            OpenGraph::addImage($firstImage->url());
-        }
-    }
-
-    #[Computed]
-    public function relatedProducts()
-    {
-        return Product::query()
-            ->where('is_active', true)
-            ->where('id', '!=', $this->product->id)
-            ->where('category', $this->product->category)
-            ->with('images')
-            ->inRandomOrder()
-            ->take(3)
-            ->get();
-    }
-
-    #[Computed]
-    public function whatsappLink(): string
-    {
-        $number = SiteSetting::get('whatsapp_number', '6281234567890');
-        $text = rawurlencode(
-            "Halo PT Mustika Makmur Abadi, saya tertarik dan ingin menanyakan informasi pemesanan produk:\n\n" .
-            "Produk: {$this->product->name}\n" .
-            "SKU: {$this->product->sku}\n" .
-            "Kemasan: " . ($this->product->weight ?? '-') . "\n\n" .
-            "Mohon info ketersediaan stok dan penawaran terbaiknya. Terima kasih."
-        );
-
-        return "https://wa.me/{$number}?text={$text}";
-    }
-}; ?>
 
 <div class="bg-slate-50/60 pb-16 dark:bg-zinc-950">
     {{-- Breadcrumb Navigation --}}
     <div class="border-b border-slate-200/80 bg-white py-3.5 dark:border-zinc-800 dark:bg-zinc-900">
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
             <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-zinc-400" aria-label="Breadcrumb">
-                <a href="{{ route('home') }}" wire:navigate class="transition hover:text-brand-600 dark:hover:text-brand-300">
+                <a href="{{ route('home') }}"  class="transition hover:text-brand-600 dark:hover:text-brand-300">
                     Beranda
                 </a>
                 <span class="text-slate-300 dark:text-zinc-600">/</span>
-                <a href="{{ route('produk') }}" wire:navigate class="transition hover:text-brand-600 dark:hover:text-brand-300">
+                <a href="{{ route('produk') }}"  class="transition hover:text-brand-600 dark:hover:text-brand-300">
                     Produk
                 </a>
                 <span class="text-slate-300 dark:text-zinc-600">/</span>
@@ -223,7 +160,7 @@ new #[Layout('layouts::public')] class extends Component
                     <div class="mt-8 border-t border-slate-100 pt-6 dark:border-zinc-800">
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
                             <a
-                                href="{{ $this->whatsappLink }}"
+                                href="{{ $whatsappLink }}"
                                 target="_blank"
                                 rel="noopener"
                                 class="inline-flex flex-1 items-center justify-center gap-2.5 rounded-xl bg-green-600 px-6 py-3.5 text-center text-sm font-bold text-white shadow-sm transition hover:bg-green-700 focus:outline-hidden focus:ring-2 focus:ring-green-600 focus:ring-offset-2"
@@ -234,7 +171,7 @@ new #[Layout('layouts::public')] class extends Component
 
                             <a
                                 href="{{ route('produk') }}"
-                                wire:navigate
+
                                 class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-center text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-slate-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-750"
                             >
                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
@@ -251,7 +188,7 @@ new #[Layout('layouts::public')] class extends Component
         </div>
 
         {{-- Related Products Section --}}
-        @if ($this->relatedProducts->isNotEmpty())
+        @if ($relatedProducts->isNotEmpty())
             <section class="mt-14" aria-labelledby="related-heading">
                 <div class="flex items-center justify-between">
                     <div>
@@ -264,7 +201,7 @@ new #[Layout('layouts::public')] class extends Component
                     </div>
                     <a
                         href="{{ route('produk', ['category' => $product->category->value]) }}"
-                        wire:navigate
+
                         class="text-sm font-bold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
                     >
                         Lihat Semua
@@ -272,7 +209,7 @@ new #[Layout('layouts::public')] class extends Component
                 </div>
 
                 <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                    @foreach ($this->relatedProducts as $rel)
+                    @foreach ($relatedProducts as $rel)
                         <div class="group flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs transition hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
                             <div>
                                 <div class="flex aspect-square w-full items-center justify-center rounded-xl bg-slate-50 p-4 dark:bg-zinc-800">
@@ -313,7 +250,7 @@ new #[Layout('layouts::public')] class extends Component
                             <div class="mt-5 pt-3 border-t border-slate-100 dark:border-zinc-800">
                                 <a
                                     href="{{ route('produk.detail', $rel) }}"
-                                    wire:navigate
+
                                     class="inline-flex w-full items-center justify-center rounded-lg bg-brand-50 py-2.5 text-center text-xs font-bold text-brand-700 transition hover:bg-brand-100 dark:bg-brand-950/60 dark:text-brand-300 dark:hover:bg-brand-900"
                                 >
                                     Lihat Detail
@@ -326,3 +263,5 @@ new #[Layout('layouts::public')] class extends Component
         @endif
     </main>
 </div>
+
+@endsection

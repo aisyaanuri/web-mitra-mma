@@ -362,6 +362,10 @@ class ProductSeeder extends Seeder
 
             $sourcePath = $yummyRoot.'/'.$item['source'];
 
+            if (! File::exists($sourcePath)) {
+                continue;
+            }
+
             $webpPath = $targetDir.'/'.$item['slug'].'.webp';
             $pngPath = $targetDir.'/'.$item['slug'].'.png';
             $jpgPath = $targetDir.'/'.$item['slug'].'.jpg';
@@ -369,14 +373,12 @@ class ProductSeeder extends Seeder
             $storedPath = null;
             if (File::exists(storage_path('app/public/'.$webpPath))) {
                 $storedPath = $webpPath;
-            } elseif (File::exists(storage_path('app/public/'.$pngPath))) {
-                $storedPath = $pngPath;
-            } elseif (File::exists(storage_path('app/public/'.$jpgPath))) {
-                $storedPath = $jpgPath;
-            } elseif (File::exists($sourcePath)) {
+            } else {
                 $extension = File::extension($sourcePath);
                 $storedPath = $targetDir.'/'.$item['slug'].'.'.$extension;
                 File::copy($sourcePath, storage_path('app/public/'.$storedPath));
+            } else {
+                continue;
             }
 
             if ($storedPath) {
@@ -406,6 +408,10 @@ class ProductSeeder extends Seeder
 
             $sourcePath = $berasRoot.'/'.$item['source'];
 
+            if (! File::exists($sourcePath)) {
+                continue;
+            }
+
             $webpPath = $targetDir.'/'.$item['slug'].'.webp';
             $pngPath = $targetDir.'/'.$item['slug'].'.png';
             $jpgPath = $targetDir.'/'.$item['slug'].'.jpg';
@@ -413,14 +419,12 @@ class ProductSeeder extends Seeder
             $storedPath = null;
             if (File::exists(storage_path('app/public/'.$webpPath))) {
                 $storedPath = $webpPath;
-            } elseif (File::exists(storage_path('app/public/'.$pngPath))) {
-                $storedPath = $pngPath;
-            } elseif (File::exists(storage_path('app/public/'.$jpgPath))) {
-                $storedPath = $jpgPath;
-            } elseif (File::exists($sourcePath)) {
+            } else {
                 $extension = File::extension($sourcePath);
                 $storedPath = $targetDir.'/'.$item['slug'].'.'.$extension;
                 File::copy($sourcePath, storage_path('app/public/'.$storedPath));
+            } else {
+                continue;
             }
 
             if ($storedPath) {

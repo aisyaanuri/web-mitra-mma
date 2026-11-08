@@ -6,7 +6,6 @@ use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class UserManagementTest extends TestCase
@@ -28,15 +27,17 @@ class UserManagementTest extends TestCase
     {
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.users.form')
-            ->set('name', 'Budi Gudang')
-            ->set('email', 'budi.gudang@mustika.test')
-            ->set('role', UserRole::AdminGudang->value)
-            ->set('password', 'RahasiaAman123!')
-            ->set('password_confirmation', 'RahasiaAman123!')
-            ->call('save')
-            ->assertHasNoErrors();
+        $this->actingAs($owner)
+            ->post(route('admin.users.store'), [
+                'name' => 'Budi Gudang',
+                'email' => 'budi.gudang@mustika.test',
+                'role' => UserRole::AdminGudang->value,
+                'password' => 'RahasiaAman123!',
+                'password_confirmation' => 'RahasiaAman123!',
+                'is_active' => '1',
+            ])
+            ->assertRedirect(route('admin.users.index'))
+            ->assertSessionHasNoErrors();
 
         $this->assertDatabaseHas('users', [
             'email' => 'budi.gudang@mustika.test',
@@ -52,13 +53,15 @@ class UserManagementTest extends TestCase
     {
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.users.form')
-            ->set('name', 'Tanpa Password')
-            ->set('email', 'tanpa@mustika.test')
-            ->set('role', UserRole::AdminGudang->value)
-            ->call('save')
-            ->assertHasErrors(['password']);
+        $this->actingAs($owner)
+            ->from(route('admin.users.create'))
+            ->post(route('admin.users.store'), [
+                'name' => 'Tanpa Password',
+                'email' => 'tanpa@mustika.test',
+                'role' => UserRole::AdminGudang->value,
+            ])
+            ->assertRedirect(route('admin.users.create'))
+            ->assertSessionHasErrors(['password']);
     }
 
     public function test_email_must_be_unique(): void
@@ -66,15 +69,17 @@ class UserManagementTest extends TestCase
         User::factory()->create(['email' => 'sudah@mustika.test']);
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.users.form')
-            ->set('name', 'Duplikat')
-            ->set('email', 'sudah@mustika.test')
-            ->set('role', UserRole::AdminGudang->value)
-            ->set('password', 'RahasiaAman123!')
-            ->set('password_confirmation', 'RahasiaAman123!')
-            ->call('save')
-            ->assertHasErrors(['email']);
+        $this->actingAs($owner)
+            ->from(route('admin.users.create'))
+            ->post(route('admin.users.store'), [
+                'name' => 'Duplikat',
+                'email' => 'sudah@mustika.test',
+                'role' => UserRole::AdminGudang->value,
+                'password' => 'RahasiaAman123!',
+                'password_confirmation' => 'RahasiaAman123!',
+            ])
+            ->assertRedirect(route('admin.users.create'))
+            ->assertSessionHasErrors(['email']);
     }
 
     public function test_owner_can_edit_a_user_without_changing_password(): void
@@ -83,11 +88,14 @@ class UserManagementTest extends TestCase
         $originalPassword = $user->password;
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.users.form', ['user' => $user])
-            ->set('name', 'Nama Baru')
-            ->call('save')
-            ->assertHasNoErrors();
+        $this->actingAs($owner)
+            ->put(route('admin.users.update', $user), [
+                'name' => 'Nama Baru',
+                'email' => $user->email,
+                'role' => $user->role->value,
+            ])
+            ->assertRedirect(route('admin.users.index'))
+            ->assertSessionHasNoErrors();
 
         $user->refresh();
         $this->assertSame('Nama Baru', $user->name);
@@ -99,9 +107,9 @@ class UserManagementTest extends TestCase
         $user = User::factory()->role(UserRole::AdminGudang)->create(['is_active' => true]);
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.users.index')
-            ->call('toggleActive', $user->id);
+        $this->actingAs($owner)
+            ->patch(route('admin.users.toggle-active', $user))
+            ->assertRedirect();
 
         $this->assertFalse($user->fresh()->is_active);
     }
@@ -110,9 +118,8 @@ class UserManagementTest extends TestCase
     {
         $owner = User::factory()->role(UserRole::Owner)->create(['is_active' => true]);
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.users.index')
-            ->call('toggleActive', $owner->id)
+        $this->actingAs($owner)
+            ->patch(route('admin.users.toggle-active', $owner))
             ->assertForbidden();
 
         $this->assertTrue($owner->fresh()->is_active);
@@ -122,11 +129,14 @@ class UserManagementTest extends TestCase
     {
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.users.form', ['user' => $owner])
-            ->set('role', UserRole::AdminGudang->value)
-            ->call('save')
-            ->assertHasNoErrors();
+        $this->actingAs($owner)
+            ->put(route('admin.users.update', $owner), [
+                'name' => $owner->name,
+                'email' => $owner->email,
+                'role' => UserRole::AdminGudang->value,
+            ])
+            ->assertRedirect(route('admin.users.index'))
+            ->assertSessionHasNoErrors();
 
         $this->assertSame(UserRole::Owner, $owner->fresh()->role);
     }
@@ -139,9 +149,9 @@ class UserManagementTest extends TestCase
         ]);
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.users.index')
-            ->call('unlock', $user->id);
+        $this->actingAs($owner)
+            ->patch(route('admin.users.unlock', $user))
+            ->assertRedirect();
 
         $user->refresh();
         $this->assertSame(0, $user->failed_login_attempts);

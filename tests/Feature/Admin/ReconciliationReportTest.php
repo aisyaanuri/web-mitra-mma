@@ -4,11 +4,12 @@ namespace Tests\Feature\Admin;
 
 use App\Enums\ReconciliationStatus;
 use App\Enums\UserRole;
+use App\Enums\WarehouseStatus;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\ReconciliationRecord;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 use Tests\TestCase;
 
 class ReconciliationReportTest extends TestCase
@@ -38,9 +39,9 @@ class ReconciliationReportTest extends TestCase
         Order::factory()->create(['marketplace_status' => 'COMPLETED', 'warehouse_status' => 'dikirim']);
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.reconciliation.index')
-            ->call('runReconciliation');
+        $this->actingAs($owner)
+            ->post(route('admin.reconciliation.run'))
+            ->assertRedirect();
 
         $this->assertSame(1, ReconciliationRecord::count());
     }
@@ -55,9 +56,9 @@ class ReconciliationReportTest extends TestCase
 
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.reconciliation.index')
-            ->set('matchStatus', ReconciliationStatus::Selisih->value)
+        $this->actingAs($owner)
+            ->get(route('admin.reconciliation.index', ['match_status' => ReconciliationStatus::Selisih->value]))
+            ->assertOk()
             ->assertSee('SELISIH-ORDER')
             ->assertDontSee('SESUAI-ORDER');
     }
@@ -72,12 +73,12 @@ class ReconciliationReportTest extends TestCase
 
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.reconciliation.index')
-            ->call('editNote', $record->id)
-            ->set('noteText', 'Barang masih dalam proses packing, belum sempat kirim.')
-            ->call('saveNote')
-            ->assertHasNoErrors();
+        $this->actingAs($owner)
+            ->patch(route('admin.reconciliation.note', $record), [
+                'investigation_note' => 'Barang masih dalam proses packing, belum sempat kirim.',
+            ])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
 
         $record->refresh();
         $this->assertSame('Barang masih dalam proses packing, belum sempat kirim.', $record->investigation_note);
@@ -101,9 +102,9 @@ class ReconciliationReportTest extends TestCase
 
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.reconciliation.index')
-            ->set('period', '2026-01')
+        $this->actingAs($owner)
+            ->get(route('admin.reconciliation.index', ['period' => '2026-01']))
+            ->assertOk()
             ->assertSee('JAN-ORDER')
             ->assertDontSee('FEB-ORDER');
     }
@@ -124,23 +125,23 @@ class ReconciliationReportTest extends TestCase
 
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.reconciliation.index')
-            ->set('search', 'ahmad')
+        $this->actingAs($owner)
+            ->get(route('admin.reconciliation.index', ['search' => 'ahmad']))
+            ->assertOk()
             ->assertSee('SEARCH-ABC-111')
             ->assertDontSee('SEARCH-XYZ-222');
     }
 
-    public function test_can_open_investigation_modal_and_see_comparisons_and_items(): void
+    public function test_reconciliation_page_displays_order_comparison_and_items(): void
     {
         $order = Order::factory()->create([
             'shopee_order_sn' => 'INVESTIGATE-001',
             'marketplace_status' => 'COMPLETED',
-            'warehouse_status' => \App\Enums\WarehouseStatus::Diterima,
+            'warehouse_status' => WarehouseStatus::Diterima,
             'buyer_username' => 'hjmardiah',
             'total_amount' => 320000,
         ]);
-        \App\Models\OrderItem::factory()->create([
+        OrderItem::factory()->create([
             'order_id' => $order->id,
             'item_name' => 'Yummy Bites Beberoll Blueberry 40g',
             'sku' => 'YB-BBL-40G',
@@ -156,18 +157,13 @@ class ReconciliationReportTest extends TestCase
 
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.reconciliation.index')
-            ->call('openInvestigation', $record->id)
-            ->assertSet('investigatingRecordId', $record->id)
+        $this->actingAs($owner)
+            ->get(route('admin.reconciliation.index'))
+            ->assertOk()
             ->assertSee('INVESTIGATE-001')
             ->assertSee('hjmardiah')
             ->assertSee('Yummy Bites Beberoll Blueberry 40g')
-            ->assertSee('YB-BBL-40G')
-            ->call('applyNoteTemplate', 'Pesanan telah terkirim via kurir marketplace tetapi admin gudang terlambat update sistem.')
-            ->assertSet('noteText', 'Pesanan telah terkirim via kurir marketplace tetapi admin gudang terlambat update sistem.')
-            ->call('closeInvestigation')
-            ->assertSet('investigatingRecordId', null);
+            ->assertSee('YB-BBL-40G');
     }
 
     public function test_can_resolve_warehouse_status_from_investigation(): void
@@ -175,7 +171,7 @@ class ReconciliationReportTest extends TestCase
         $order = Order::factory()->create([
             'shopee_order_sn' => 'RESOLVE-999',
             'marketplace_status' => 'COMPLETED',
-            'warehouse_status' => \App\Enums\WarehouseStatus::Diterima,
+            'warehouse_status' => WarehouseStatus::Diterima,
         ]);
         $record = ReconciliationRecord::factory()->create([
             'order_id' => $order->id,
@@ -184,15 +180,16 @@ class ReconciliationReportTest extends TestCase
 
         $owner = User::factory()->role(UserRole::Owner)->create();
 
-        Livewire::actingAs($owner)
-            ->test('pages::admin.reconciliation.index')
-            ->call('openInvestigation', $record->id)
-            ->call('resolveWarehouseStatus', $record->id, 'dikirim');
+        $this->actingAs($owner)
+            ->patch(route('admin.reconciliation.warehouse-status', $record), [
+                'warehouse_status' => WarehouseStatus::Dikirim->value,
+            ])
+            ->assertRedirect();
 
         $order->refresh();
         $record->refresh();
 
-        $this->assertSame(\App\Enums\WarehouseStatus::Dikirim, $order->warehouse_status);
+        $this->assertSame(WarehouseStatus::Dikirim, $order->warehouse_status);
         $this->assertSame(ReconciliationStatus::Sesuai, $record->match_status);
         $this->assertDatabaseHas('warehouse_process_logs', [
             'order_id' => $order->id,

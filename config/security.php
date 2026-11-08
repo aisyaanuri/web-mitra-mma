@@ -14,7 +14,7 @@ return [
 
     'login' => [
         'max_attempts' => env('LOGIN_MAX_ATTEMPTS', 5),
-        'lockout_minutes' => env('LOGIN_LOCKOUT_MINUTES', 15),
+        'lockout_minutes' => env('LOGIN_LOCKOUT_MINUTES', 1),
     ],
 
 ];

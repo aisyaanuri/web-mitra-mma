@@ -26,8 +26,8 @@ class ReconciliationExport implements FromQuery, WithHeadings, WithMapping
             ->when($this->matchStatus, fn ($q) => $q->where('match_status', $this->matchStatus))
             ->when($this->search, function ($q) {
                 $q->whereHas('order', function ($sub) {
-                    $sub->where('shopee_order_sn', 'like', '%' . $this->search . '%')
-                        ->orWhere('buyer_username', 'like', '%' . $this->search . '%');
+                    $sub->where('shopee_order_sn', 'like', '%'.$this->search.'%')
+                        ->orWhere('buyer_username', 'like', '%'.$this->search.'%');
                 });
             })
             ->with('order')
