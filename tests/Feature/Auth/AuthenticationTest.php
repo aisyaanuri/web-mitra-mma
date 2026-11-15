@@ -48,6 +48,51 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_authenticated_user_is_logged_out_before_an_invalid_login_attempt(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->from(route('login'))
+            ->post(route('login.store'), [
+                'email' => $user->email,
+                'password' => 'wrong-password',
+            ]);
+
+        $response
+            ->assertRedirect(route('login'))
+            ->assertSessionHasErrors('email');
+
+        $this->assertGuest();
+    }
+
+    public function test_authenticated_user_can_submit_a_valid_password_to_login_again(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_authenticated_user_can_switch_to_another_account_via_login(): void
+    {
+        $currentUser = User::factory()->create();
+        $loginUser = User::factory()->create();
+
+        $response = $this->actingAs($currentUser)->post(route('login.store'), [
+            'email' => $loginUser->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertAuthenticatedAs($loginUser);
+    }
+
     public function test_users_with_two_factor_enabled_are_redirected_to_two_factor_challenge(): void
     {
         $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());

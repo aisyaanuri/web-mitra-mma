@@ -4,8 +4,8 @@ Dokumen ini mencatat alur yang ditemukan pada kode saat diperiksa. Route login/l
 
 ## 1) Ringkasan alur
 
-1. Pengunjung membuka `GET /login`. Route view Fortify memakai middleware `web` dan `guest`; `config/fortify.php` mengaktifkan route view. `FortifyServiceProvider` mengarahkan view login ke `resources/views/pages/auth/login.blade.php`.
-2. Form mengirim `POST /login` dengan CSRF token, `email`, `password`, dan checkbox `remember` ke route bernama `login.store`. Fortify menjalankan validasi request: username yang dikonfigurasi (`email`) dan password wajib berupa string.
+1. Pengunjung membuka `GET /login`. Route view Fortify memakai middleware `web` dan `guest`; `LogoutBeforeLogin` hanya bertindak pada POST `login.store`, sehingga GET tetap mengikuti perilaku guest biasa. `config/fortify.php` mengaktifkan route view. `FortifyServiceProvider` mengarahkan view login ke `resources/views/pages/auth/login.blade.php`.
+2. Form mengirim `POST /login` dengan CSRF token, `email`, `password`, dan checkbox `remember` ke route bernama `login.store`. `LogoutBeforeLogin` memutus sesi guard Fortify sebelum middleware `guest`; Fortify lalu menjalankan validasi request: username yang dikonfigurasi (`email`) dan password wajib berupa string.
 3. Middleware `throttle:login` memakai limiter di `FortifyServiceProvider`. Kunci limiter adalah email yang diturunkan ke huruf kecil, ditransliterasi, lalu digabung dengan IP; batasnya 5 request per menit. Request keenam yang masih dalam jendela tersebut dikembalikan ke halaman sebelumnya dengan error `auth.throttle` pada field email.
 4. Jika request lolos limiter route, validasi Fortify menerima `email`/username dan password sebagai string wajib. Rule server tidak menguji format email; `type="email"` hanya memberi validasi browser. Pipeline Fortify kemudian memanggil `Fortify::authenticateUsing`, yang mencari user dan memeriksa `isLocked()`.
 5. Untuk akun yang tidak terkunci, callback memeriksa `is_active` dan hash password. Percobaan dicatat di `login_attempts`. Password salah atau akun nonaktif menghasilkan autentikasi gagal; untuk pengguna yang ditemukan, penghitung gagal bertambah. Pengguna yang tidak ditemukan tidak mempunyai penghitung akun untuk ditambah.
@@ -14,12 +14,21 @@ Dokumen ini mencatat alur yang ditemukan pada kode saat diperiksa. Route login/l
 8. Pada login tanpa 2FA, Fortify meregenerasi session dan mengarahkan ke URL intended atau `config/fortify.php` → `/dashboard`. Pada 2FA, controller challenge yang mengautentikasi user dan meregenerasi session setelah kode valid. Route dashboard mensyaratkan `auth` dan `verified`; route admin kemudian menerapkan middleware role.
 9. Logout dikirim sebagai `POST /logout` oleh form sidebar. Fortify melakukan logout guard, invalidasi session, regenerasi CSRF token, lalu response Fortify mengarahkan ke halaman awal.
 
+### Sesi lama saat POST login
+
+Jika browser mengirim `POST /login` ketika sesi masih terautentikasi, `LogoutBeforeLogin` menjalankan logout pada guard Fortify sebelum `guest` dan pemeriksaan kredensial. Middleware tidak menginvalidasi session atau mengganti token CSRF; Fortify menangani regenerasi session ketika login berhasil. Password salah kembali ke `/login` dengan error email dan sesi menjadi guest. Password benar dapat mempertahankan akun yang sama atau mengganti sesi ke akun yang diketik. Rate limiter, pemeriksaan password, lockout, dan challenge 2FA tetap berjalan pada alur login biasa.
+
+`config/fortify.php:105` memasang middleware pada grup Fortify. `app/Http/Middleware/LogoutBeforeLogin.php:18` membatasi tindakan ke POST route bernama `login.store`, baris 22 memilih guard Fortify, dan baris 25 menjalankan logout. Verifikasi `php artisan route:list --path=login -v`: route POST menunjukkan `web`, `LogoutBeforeLogin`, `RedirectIfAuthenticated:web`, lalu `ThrottleRequests:login` — jadi logout berlangsung sebelum `guest`. GET login dan route passkey/2FA melewati middleware tanpa perubahan sesi.
+
+Tes password salah dan sesi guest ada di `tests/Feature/Auth/AuthenticationTest.php:63-66`; login benar di baris 78-79; pergantian akun di baris 92-93. Cakupan lock setelah lima percobaan dari sesi login aktif memeriksa counter dan lock pada `tests/Feature/Auth/AccountLockoutTest.php:51-53`.
+
 ## 2) Tabel file
 
 | Langkah | File (path dari root repository) | Fungsi singkat |
 |---|---|---|
 | Menampilkan form dan mengirim kredensial | `resources/views/pages/auth/login.blade.php` | Form email/password, CSRF, remember, passkey, serta penampil error. |
 | Menentukan view, validasi kredensial, pencatatan, dan kunci akun | `app/Providers/FortifyServiceProvider.php` | Mendaftarkan callback Fortify untuk autentikasi dan limiter. |
+| Mengakhiri sesi lama sebelum middleware guest pada POST login | `app/Http/Middleware/LogoutBeforeLogin.php`; `config/fortify.php` | Logout guard Fortify hanya pada route `login.store`; tidak menginvalidasi session atau mengganti token CSRF. |
 | Menentukan nama username, destination, middleware, dan fitur Fortify | `config/fortify.php` | Username `email`, home `/dashboard`, limiter bernama, 2FA/passkeys. |
 | Menentukan batas dan durasi kunci akun | `config/security.php` | `LOGIN_MAX_ATTEMPTS` dan `LOGIN_LOCKOUT_MINUTES` dengan default 5 dan 1. |
 | Memeriksa status kunci dan cast field keamanan | `app/Models/User.php`; `database/migrations/2026_09_15_044631_add_role_and_security_fields_to_users_table.php` | `isLocked()`, cast counter menjadi integer, serta kolom counter/waktu kunci/metadata login. |

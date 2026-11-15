@@ -30,6 +30,29 @@ class AccountLockoutTest extends TestCase
         $this->assertSame($maxAttempts, LoginAttempt::where('email', $user->email)->where('successful', false)->count());
     }
 
+    public function test_five_failed_attempts_from_an_authenticated_session_lock_the_account(): void
+    {
+        $user = User::factory()->create();
+        $maxAttempts = config('security.login.max_attempts');
+
+        for ($i = 0; $i < $maxAttempts; $i++) {
+            $response = $this->actingAs($user)
+                ->from(route('login'))
+                ->post(route('login.store'), [
+                    'email' => $user->email,
+                    'password' => 'wrong-password',
+                ]);
+
+            $response->assertRedirect(route('login'));
+        }
+
+        $user->refresh();
+
+        $this->assertSame($maxAttempts, $user->failed_login_attempts);
+        $this->assertTrue($user->isLocked());
+        $this->assertGuest();
+    }
+
     public function test_locked_account_cannot_login_even_with_correct_password(): void
     {
         $user = User::factory()->create([

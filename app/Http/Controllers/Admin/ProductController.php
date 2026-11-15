@@ -103,7 +103,7 @@ class ProductController extends Controller
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:255'],
             'newImages' => ['nullable', 'array', 'max:5'],
-            'newImages.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+            'newImages.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:1024'],
         ], [
             'newImages.max' => __('Maksimal 5 foto yang dapat diunggah sekaligus.'),
             'newImages.*.image' => __('File yang diunggah harus berupa file gambar yang valid.'),
