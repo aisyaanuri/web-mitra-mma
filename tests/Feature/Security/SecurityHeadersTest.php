@@ -37,4 +37,12 @@ class SecurityHeadersTest extends TestCase
     {
         $this->get('/.env')->assertNotFound();
     }
+
+    public function test_auth_and_authenticated_pages_have_no_cache_headers(): void
+    {
+        $response = $this->get(route('login'));
+
+        $response->assertHeader('Cache-Control', 'max-age=0, must-revalidate, no-cache, no-store, private');
+        $response->assertHeader('Pragma', 'no-cache');
+    }
 }

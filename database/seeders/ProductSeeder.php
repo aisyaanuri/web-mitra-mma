@@ -362,21 +362,18 @@ class ProductSeeder extends Seeder
 
             $sourcePath = $yummyRoot.'/'.$item['source'];
             $webpPath = $targetDir.'/'.$item['slug'].'.webp';
-            $storedWebpPath = storage_path('app/public/'.$webpPath);
+            $storedPath = null;
 
-            if (! File::exists($sourcePath) && File::exists($storedWebpPath)) {
-                $sourcePath = $storedWebpPath;
-            }
-            if (! File::exists($sourcePath)) {
-                continue;
-            }
-
-            if (File::exists($storedWebpPath)) {
+            if (File::exists(storage_path('app/public/'.$webpPath))) {
                 $storedPath = $webpPath;
-            } else {
+            } elseif (File::exists($sourcePath)) {
                 $extension = File::extension($sourcePath);
                 $storedPath = $targetDir.'/'.$item['slug'].'.'.$extension;
                 File::copy($sourcePath, storage_path('app/public/'.$storedPath));
+            }
+
+            if (! $storedPath) {
+                continue;
             }
 
             ProductImage::updateOrCreate(
@@ -404,21 +401,18 @@ class ProductSeeder extends Seeder
 
             $sourcePath = $berasRoot.'/'.$item['source'];
             $webpPath = $targetDir.'/'.$item['slug'].'.webp';
-            $storedWebpPath = storage_path('app/public/'.$webpPath);
+            $storedPath = null;
 
-            if (! File::exists($sourcePath) && File::exists($storedWebpPath)) {
-                $sourcePath = $storedWebpPath;
-            }
-            if (! File::exists($sourcePath)) {
-                continue;
-            }
-
-            if (File::exists($storedWebpPath)) {
+            if (File::exists(storage_path('app/public/'.$webpPath))) {
                 $storedPath = $webpPath;
-            } else {
+            } elseif (File::exists($sourcePath)) {
                 $extension = File::extension($sourcePath);
                 $storedPath = $targetDir.'/'.$item['slug'].'.'.$extension;
                 File::copy($sourcePath, storage_path('app/public/'.$storedPath));
+            }
+
+            if (! $storedPath) {
+                continue;
             }
 
             ProductImage::updateOrCreate(

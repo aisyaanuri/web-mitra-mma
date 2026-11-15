@@ -123,4 +123,30 @@ class AuthenticationTest extends TestCase
 
         $this->assertGuest();
     }
+
+    public function test_authenticated_user_cannot_login_with_invalid_password_after_navigating_back(): void
+    {
+        $user = User::factory()->create();
+
+        // Simulate user already authenticated (e.g. on dashboard, then hitting back button to login page)
+        $this->actingAs($user);
+
+        // User attempts to log in again with an invalid password
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
+
+        $response->assertSessionHasErrorsIn('email');
+        $this->assertGuest();
+    }
+
+    public function test_authenticated_user_is_redirected_to_dashboard_on_get_login(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('login'));
+
+        $response->assertRedirect(route('dashboard', absolute: false));
+    }
 }

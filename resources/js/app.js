@@ -20,3 +20,10 @@ document.querySelectorAll('.reveal').forEach((element) => observer.observe(eleme
 
 window.Swiper = Swiper;
 window.SwiperModules = { Navigation, Pagination };
+
+// Force reload when navigated via browser back/forward cache (bfcache)
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
