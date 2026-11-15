@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -102,7 +103,7 @@ class ProductController extends Controller
             'meta_title' => ['nullable', 'string', 'max:255'],
             'meta_description' => ['nullable', 'string', 'max:255'],
             'newImages' => ['nullable', 'array', 'max:5'],
-            'newImages.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+            'newImages.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:1024'],
         ], [
             'newImages.max' => __('Maksimal 5 foto yang dapat diunggah sekaligus.'),
             'newImages.*.image' => __('File yang diunggah harus berupa file gambar yang valid.'),
@@ -115,7 +116,7 @@ class ProductController extends Controller
         }
 
         $images = $validated['newImages'] ?? [];
-        $product->fill(collect($validated)->except('newImages')->toArray());
+        $product->fill(Arr::except($validated, ['newImages']));
         $product->save();
 
         foreach ($images as $index => $file) {

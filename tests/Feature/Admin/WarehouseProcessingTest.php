@@ -69,7 +69,10 @@ class WarehouseProcessingTest extends TestCase
 
     public function test_admin_gudang_can_advance_status_through_the_flow(): void
     {
-        $order = Order::factory()->create(['warehouse_status' => WarehouseStatus::Diterima]);
+        $order = Order::factory()->create([
+            'marketplace_status' => 'READY_TO_SHIP',
+            'warehouse_status' => WarehouseStatus::Diterima,
+        ]);
         $user = User::factory()->role(UserRole::AdminGudang)->create();
 
         $this->actingAs($user)->patch(route('admin.warehouse.advance', $order))->assertRedirect();

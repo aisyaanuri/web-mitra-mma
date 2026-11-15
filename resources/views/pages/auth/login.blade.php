@@ -45,6 +45,9 @@
                     autocomplete="email"
                     placeholder="email@example.com"
                 />
+                @error('email')
+                    <p class="mt-2 text-xs font-medium text-rose-500 dark:text-rose-400">{{ $message }}</p>
+                @enderror
             </div>
 
             <!-- Password -->
@@ -58,6 +61,9 @@
                     placeholder="••••••••"
                     viewable
                 />
+                @error('password')
+                    <p class="mt-2 text-xs font-medium text-rose-500 dark:text-rose-400">{{ $message }}</p>
+                @enderror
             </div>
 
             <!-- Remember Me & Forgot Password -->

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('order_returns', function (Blueprint $table) {
             $table->string('physical_status')->default('menunggu_barang')->after('refund_amount');
             $table->text('physical_note')->nullable()->after('physical_status');
-            $table->foreignId('verified_by')->nullable()->constrained('users')->nullOnDelete()->after('physical_note');
+            $table->foreignId('verified_by')->nullable()->after('physical_note')->constrained('users')->nullOnDelete();
             $table->timestamp('received_at')->nullable()->after('verified_by');
         });
     }

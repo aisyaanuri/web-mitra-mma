@@ -23,12 +23,13 @@ class ProductImage extends Model
 
     public function url(): ?string
     {
-        if (!Storage::disk('public')->exists($this->image_path)) {
+        if (! Storage::disk('public')->exists($this->image_path)) {
             return null;
         }
-        $url = asset('storage/' . $this->image_path);
+        $url = asset('storage/'.$this->image_path);
         $path = Storage::disk('public')->path($this->image_path);
         $mtime = file_exists($path) ? filemtime($path) : time();
-        return $url . '?v=' . $mtime;
+
+        return $url.'?v='.$mtime;
     }
 }

@@ -9,6 +9,7 @@ use App\Jobs\RunReconciliationJob;
 use App\Models\Order;
 use App\Models\ReconciliationRecord;
 use App\Models\WarehouseProcessLog;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,7 +77,7 @@ class ReconciliationController extends Controller
     {
         $validated = $request->validate(['warehouse_status' => ['required', Rule::enum(WarehouseStatus::class)]]);
         $order = $record->order;
-        abort_unless($order, 404);
+        abort_unless($order instanceof Order, 404);
         $target = WarehouseStatus::from($validated['warehouse_status']);
         $previous = $order->warehouse_status;
         $order->update(['warehouse_status' => $target->value]);
@@ -108,16 +109,22 @@ class ReconciliationController extends Controller
         return back()->with('status', __('Status gudang berhasil diperbarui dan status rekonsiliasi telah disesuaikan.'));
     }
 
-    private function baseQuery(array $filters)
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return Builder<ReconciliationRecord>
+     */
+    private function baseQuery(array $filters): Builder
     {
         return ReconciliationRecord::query()
-            ->when($filters['period'] ?? null, function ($query, $period) {
-                [$year, $month] = explode('-', $period);
-                $query->whereYear('period', $year)->whereMonth('period', $month);
+            ->when($filters['period'] ?? null, function (Builder $query, mixed $period): void {
+                if (is_string($period) && str_contains($period, '-')) {
+                    [$year, $month] = explode('-', $period);
+                    $query->whereYear('period', $year)->whereMonth('period', $month);
+                }
             })
-            ->when($filters['search'] ?? null, fn ($query, $search) => $query->whereHas('order', fn ($orderQuery) => $orderQuery
+            ->when($filters['search'] ?? null, fn (Builder $query, mixed $search) => $query->whereHas('order', fn ($orderQuery) => $orderQuery
                 ->where('shopee_order_sn', 'like', "%{$search}%")
                 ->orWhere('buyer_username', 'like', "%{$search}%")))
-            ->when($filters['marketplace_status'] ?? null, fn ($query, $status) => $query->where('marketplace_status_snapshot', $status));
+            ->when($filters['marketplace_status'] ?? null, fn (Builder $query, mixed $status) => $query->where('marketplace_status_snapshot', $status));
     }
 }

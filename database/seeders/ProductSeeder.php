@@ -361,13 +361,17 @@ class ProductSeeder extends Seeder
             );
 
             $sourcePath = $yummyRoot.'/'.$item['source'];
+            $webpPath = $targetDir.'/'.$item['slug'].'.webp';
+            $storedWebpPath = storage_path('app/public/'.$webpPath);
 
+            if (! File::exists($sourcePath) && File::exists($storedWebpPath)) {
+                $sourcePath = $storedWebpPath;
+            }
             if (! File::exists($sourcePath)) {
                 continue;
             }
 
-            $webpPath = $targetDir.'/'.$item['slug'].'.webp';
-            if (File::exists(storage_path('app/public/'.$webpPath))) {
+            if (File::exists($storedWebpPath)) {
                 $storedPath = $webpPath;
             } else {
                 $extension = File::extension($sourcePath);
@@ -399,13 +403,17 @@ class ProductSeeder extends Seeder
             );
 
             $sourcePath = $berasRoot.'/'.$item['source'];
+            $webpPath = $targetDir.'/'.$item['slug'].'.webp';
+            $storedWebpPath = storage_path('app/public/'.$webpPath);
 
+            if (! File::exists($sourcePath) && File::exists($storedWebpPath)) {
+                $sourcePath = $storedWebpPath;
+            }
             if (! File::exists($sourcePath)) {
                 continue;
             }
 
-            $webpPath = $targetDir.'/'.$item['slug'].'.webp';
-            if (File::exists(storage_path('app/public/'.$webpPath))) {
+            if (File::exists($storedWebpPath)) {
                 $storedPath = $webpPath;
             } else {
                 $extension = File::extension($sourcePath);

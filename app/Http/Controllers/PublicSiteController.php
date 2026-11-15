@@ -129,13 +129,14 @@ class PublicSiteController extends Controller
         OpenGraph::setTitle('Tentang Kami - PT Mustika Makmur Abadi');
 
         $visiMisi = CompanyContent::section('tentang_kami_visi_misi');
-        preg_match_all('/^\d+\.\s*(.+)$/m', $visiMisi?->body ?? '', $points);
-        preg_match('/Visi\s*\n(.*?)\n\s*\n\s*Misi/is', $visiMisi?->body ?? '', $matches);
+        $body = $visiMisi ? $visiMisi->body : '';
+        preg_match_all('/^\d+\.\s*(.+)$/m', $body, $points);
+        preg_match('/Visi\s*\n(.*?)\n\s*\n\s*Misi/is', $body, $matches);
 
         return view('pages.public.tentang-kami', [
             'content' => CompanyContent::section('tentang_kami'),
             'visiMisi' => $visiMisi,
-            'misiPoints' => array_map('trim', $points[1] ?? []),
+            'misiPoints' => array_map('trim', $points[1]),
             'visiText' => isset($matches[1]) ? trim($matches[1]) : null,
             'timeline' => [
                 [
