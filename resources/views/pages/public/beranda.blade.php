@@ -22,7 +22,7 @@
         <div class="relative z-10 mx-auto flex max-w-6xl flex-col justify-center px-4 py-20 sm:px-6 sm:py-28 lg:py-32">
             <div class="max-w-xl reveal">
                 <h1 class="heading-display font-display text-4xl font-extrabold text-white sm:text-5xl lg:text-6xl">
-                    {{ $hero?->title ?? 'Distributor Resmi Yummy Bites & Beras Premium' }}
+                    {{ $hero?->title ?? 'Distributor resmi Yummy Bites & Beras Premium' }}
                 </h1>
                 <p class="mt-5 max-w-md text-lg leading-relaxed text-white/85">
                     {{ $hero?->body ?? 'Menyuplai 355+ outlet di 8 wilayah Indonesia bagian timur, langsung dari gudang di Sidoarjo.' }}
