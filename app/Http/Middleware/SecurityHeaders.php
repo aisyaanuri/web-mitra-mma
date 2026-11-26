@@ -25,18 +25,33 @@ class SecurityHeaders
         $response->headers->set('X-Frame-Options', 'DENY');
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        $scriptSrc = "'self' 'unsafe-inline' 'unsafe-eval'";
+        $styleSrc = "'self' 'unsafe-inline'";
+        $fontSrc = "'self' data:";
+        $connectSrc = "'self'";
+
+        if (app()->environment('local')) {
+            $vite = 'http://localhost:5173 http://127.0.0.1:5173 http://[::1]:5173';
+            $viteWs = 'ws://localhost:5173 ws://127.0.0.1:5173 ws://[::1]:5173';
+
+            $scriptSrc .= " {$vite}";
+            $styleSrc .= " {$vite}";
+            $fontSrc .= " {$vite}";
+            $connectSrc .= " {$vite} {$viteWs}";
+        }
+
         $response->headers->set('Content-Security-Policy', implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-            "style-src 'self' 'unsafe-inline'",
+            "script-src {$scriptSrc}",
+            "style-src {$styleSrc}",
             "img-src 'self' data:",
-            "font-src 'self' data:",
+            "font-src {$fontSrc}",
             'frame-src https://www.google.com',
             "frame-ancestors 'none'",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",
-            "connect-src 'self'",
+            "connect-src {$connectSrc}",
         ]));
 
         if ($request->secure()) {
